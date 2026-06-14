@@ -311,7 +311,7 @@ export function useBannerSlide<T extends HTMLElement>(ref: React.RefObject<T>) {
 
 | 组件 | 样式迁移 | GSAP |
 |---|---|---|
-| `src/App.tsx` | `.app` → `max-w-[1400px] mx-auto px-5 pt-4 pb-10` | — |
+| `src/App.tsx` | `.app` → `max-w-[2560px] mx-auto px-5 pt-4 pb-10` | — |
 | `Header.tsx` | `.app-header*` → flex 布局类 | — |
 | `ThemeToggle.tsx` | `.theme-toggle` → 按钮 + 边框类 | — |
 | `LastUpdated.tsx` | `.last-updated*` → 文字大小 / 颜色类 | — |

@@ -68,14 +68,14 @@ scx-gold/
 - Create: `package.json`, `vite.config.ts`, `tsconfig.json`, `tsconfig.node.json`, `index.html`, `.gitignore`, `README.md`
 - Create: `src/main.tsx`, `src/App.tsx` (placeholder)
 
-- [ ] **Step 1: Initialize npm project + install deps**
+- [ ] **Step 1: Initialize pnpm project + install deps**
 
 Run from `/Users/scx/Documents/code/scx-gold`:
 
 ```bash
-npm init -y
-npm install react@18 react-dom@18
-npm install -D vite@5 @vitejs/plugin-react@4 typescript@5 @types/react@18 @types/react-dom@18 vitest@1 @vitest/ui jsdom
+pnpm init
+pnpm add react@18 react-dom@18
+pnpm add -D vite@5 @vitejs/plugin-react@4 typescript@5 @types/react@18 @types/react-dom@18 vitest@1 @vitest/ui jsdom
 ```
 
 - [ ] **Step 2: Write `package.json` scripts**
@@ -88,6 +88,7 @@ Overwrite `package.json` scripts section:
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "packageManager": "pnpm@11.0.9",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -219,29 +220,29 @@ A-share limit-up candidate screening tool. Live data from East Money public JSON
 ## Dev
 
 \`\`\`bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 \`\`\`
 
 ## Test
 
 \`\`\`bash
-npm test
+pnpm test
 \`\`\`
 ```
 
 - [ ] **Step 11: Verify scaffold builds and runs**
 
-Run: `npm run dev` then `Ctrl-C` after Vite prints the local URL.
+Run: `pnpm dev` then `Ctrl-C` after Vite prints the local URL.
 Expected: no errors, Vite prints `Local: http://localhost:5173/`.
 
-Run: `npm test -- --run` (will be no tests yet).
+Run: `pnpm test` (will be no tests yet).
 Expected: Vitest prints `No test files found` or `0 tests`.
 
 - [ ] **Step 12: Commit**
 
 ```bash
-git add package.json package-lock.json tsconfig.json tsconfig.node.json vite.config.ts index.html .gitignore README.md src/main.tsx src/App.tsx
+git add package.json pnpm-lock.yaml tsconfig.json tsconfig.node.json vite.config.ts index.html .gitignore README.md src/main.tsx src/App.tsx src/styles/theme.css src/styles/App.css
 git commit -m "chore: scaffold Vite + React + TS + Vitest project"
 ```
 
@@ -412,7 +413,7 @@ export interface Clue {
 
 - [ ] **Step 2: Verify TS compiles**
 
-Run: `npx tsc --noEmit`
+Run: `pnpm exec tsc --noEmit`
 Expected: no errors.
 
 - [ ] **Step 3: Commit**
@@ -499,7 +500,7 @@ describe('formatPrice', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run src/utils/format.test.ts`
+Run: `pnpm exec vitest run src/utils/format.test.ts`
 Expected: FAIL with "Cannot find module './format'".
 
 - [ ] **Step 3: Write `src/utils/format.ts`**
@@ -532,7 +533,7 @@ export function formatPrice(value: number): string {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run src/utils/format.test.ts`
+Run: `pnpm exec vitest run src/utils/format.test.ts`
 Expected: PASS, all tests green.
 
 - [ ] **Step 5: Commit**
@@ -666,7 +667,7 @@ describe('generateClues', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run src/utils/clues.test.ts`
+Run: `pnpm exec vitest run src/utils/clues.test.ts`
 Expected: FAIL "Cannot find module './clues'".
 
 - [ ] **Step 3: Write `src/utils/clues.ts`**
@@ -725,7 +726,7 @@ export function generateClues(stock: Stock): Clue[] {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run src/utils/clues.test.ts`
+Run: `pnpm exec vitest run src/utils/clues.test.ts`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -816,7 +817,7 @@ describe('sortStocks', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run src/utils/sort.test.ts`
+Run: `pnpm exec vitest run src/utils/sort.test.ts`
 Expected: FAIL "Cannot find module './sort'".
 
 - [ ] **Step 3: Write `src/utils/sort.ts`**
@@ -864,7 +865,7 @@ export function sortStocks(stocks: Stock[], state: SortState): Stock[] {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run src/utils/sort.test.ts`
+Run: `pnpm exec vitest run src/utils/sort.test.ts`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1005,7 +1006,7 @@ describe('jsonpRequest', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run src/api/eastmoney.test.ts`
+Run: `pnpm exec vitest run src/api/eastmoney.test.ts`
 Expected: FAIL "Cannot find module './eastmoney'".
 
 - [ ] **Step 3: Write `src/api/eastmoney.ts`**
@@ -1062,7 +1063,7 @@ export function jsonpRequest<T>(
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run src/api/eastmoney.test.ts`
+Run: `pnpm exec vitest run src/api/eastmoney.test.ts`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1213,7 +1214,7 @@ import { beforeEach } from 'vitest';
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run src/api/stocks.test.ts`
+Run: `pnpm exec vitest run src/api/stocks.test.ts`
 Expected: FAIL "Cannot find module './stocks'".
 
 - [ ] **Step 3: Write `src/api/stocks.ts`**
@@ -1288,7 +1289,7 @@ function marketCode(n: number): Market {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run src/api/stocks.test.ts`
+Run: `pnpm exec vitest run src/api/stocks.test.ts`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1377,12 +1378,12 @@ describe('useTradingHours', () => {
 - [ ] **Step 2: Install @testing-library/react**
 
 ```bash
-npm install -D @testing-library/react
+pnpm add -D @testing-library/react
 ```
 
 - [ ] **Step 3: Run tests to verify they fail**
 
-Run: `npx vitest run src/hooks/useTradingHours.test.ts`
+Run: `pnpm exec vitest run src/hooks/useTradingHours.test.ts`
 Expected: FAIL "Cannot find module './useTradingHours'".
 
 - [ ] **Step 4: Write `src/hooks/useTradingHours.ts`**
@@ -1422,13 +1423,13 @@ export function useTradingHours(intervalMs = 60_000): boolean {
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `npx vitest run src/hooks/useTradingHours.test.ts`
+Run: `pnpm exec vitest run src/hooks/useTradingHours.test.ts`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/hooks/useTradingHours.ts src/hooks/useTradingHours.test.ts package.json package-lock.json
+git add src/hooks/useTradingHours.ts src/hooks/useTradingHours.test.ts package.json pnpm-lock.yaml
 git commit -m "feat: add useTradingHours hook with tests"
 ```
 
@@ -2353,7 +2354,7 @@ export function App() {
 
 - [ ] **Step 3: Verify TS compiles**
 
-Run: `npx tsc --noEmit`
+Run: `pnpm exec tsc --noEmit`
 Expected: no errors.
 
 - [ ] **Step 4: Commit**
@@ -2814,22 +2815,22 @@ git commit -m "feat: add layout, component, and responsive styles"
 
 - [ ] **Step 1: Run full test suite**
 
-Run: `npm test`
+Run: `pnpm test`
 Expected: All tests pass (format, clues, sort, eastmoney, stocks, useTradingHours).
 
 - [ ] **Step 2: Run TS check**
 
-Run: `npx tsc --noEmit`
+Run: `pnpm exec tsc --noEmit`
 Expected: no errors.
 
 - [ ] **Step 3: Run production build**
 
-Run: `npm run build`
+Run: `pnpm build`
 Expected: `dist/` directory created, no errors.
 
 - [ ] **Step 4: Manual smoke test in browser**
 
-Run: `npm run dev`
+Run: `pnpm dev`
 Open the printed URL in a browser.
 
 Verify:

@@ -5,3 +5,8 @@ dist-ssr
 .DS_Store
 .remember/
 .vscode/
+.env
+.env.*
+coverage/
+*.log
+pnpm-debug.log*

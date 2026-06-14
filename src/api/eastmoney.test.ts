@@ -27,10 +27,6 @@ describe('jsonpRequest', () => {
       setTimeout(() => {
         const src = (script as any).src || (script as any)._src;
         if (!src) return;
-        const match = src.match(/cb=([^&]+)/);
-        if (!match) return;
-        const cbName = match[1];
-        const cb = (window as any)[cbName];
         // Don't auto-invoke — tests do this explicitly via the jsonpRequest promise
       }, 0);
       return node;

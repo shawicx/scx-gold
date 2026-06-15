@@ -39,9 +39,9 @@ export function StockTable({ stocks, sort, onSort }: StockTableProps) {
       <table className="w-full border-collapse text-[15px]">
         <thead>
           <tr>
-            <SortableTh label="代码" sortKey="code" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />
-            <SortableTh label="名称" sortKey="name" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />
-            <SortableTh label="市场" sortKey="market" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />
+            <SortableTh label="代码" sortKey="code" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
+            <SortableTh label="名称" sortKey="name" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
+            <SortableTh label="市场" sortKey="market" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
             <th className={`hidden md:table-cell ${TH_LEFT}`}>行业</th>
             <SortableTh label="最新价" sortKey="price" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />
             <SortableTh label="涨跌幅" sortKey="pctChange" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />

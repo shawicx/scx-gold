@@ -8,10 +8,12 @@ const BOARD_FS: Record<BoardScope, string> = {
   all: 'm:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048',
 };
 
+type EmValue = number | string | null | undefined;
+
 interface EmRow {
-  f2: number; f3: number; f6: number; f8: number;
-  f12: string; f13: number; f14: string;
-  f15: number; f16: number; f62: number; f184: number;
+  f2: EmValue; f3: EmValue; f6: EmValue; f8: EmValue;
+  f12: EmValue; f13: EmValue; f14: EmValue;
+  f15: EmValue; f16: EmValue; f62: EmValue; f184: EmValue;
 }
 
 interface EmResponse {
@@ -30,7 +32,7 @@ export async function fetchStocks({
   const fs = BOARD_FS[boardScope];
   const url =
     `https://push2.eastmoney.com/api/qt/clist/get` +
-    `?pn=1&pz=${pageSize}&po=1&np=1&fltt=2&invt=2` +
+    `?pn=1&pz=${pageSize}&po=1&np=1&fltt=2&invt=2&fid=f3` +
     `&fs=${encodeURIComponent(fs)}` +
     `&fields=${EM_FIELDS}`;
   const res = await jsonpRequest<EmResponse>(url);
@@ -38,23 +40,34 @@ export async function fetchStocks({
   return rows.map(rowToStock).filter((s): s is Stock => s !== null);
 }
 
+function toNumber(v: EmValue): number {
+  return typeof v === 'number' ? v : 0;
+}
+
+function toString(v: EmValue): string {
+  return typeof v === 'string' ? v : '';
+}
+
 function rowToStock(row: EmRow): Stock | null {
-  if (!row.f12 || !row.f14) return null;
-  const market = marketCode(row.f13);
+  const code = toString(row.f12);
+  const name = toString(row.f14);
+  if (!code || !name) return null;
+  if (typeof row.f2 !== 'number') return null; // skip suspended/delisted ("-")
+  const market = marketCode(typeof row.f13 === 'number' ? row.f13 : -1);
   return {
-    code: row.f12,
-    name: row.f14,
+    code,
+    name,
     market,
-    price: row.f2 ?? 0,
-    pctChange: row.f3 ?? 0,
-    turnoverRate: row.f8 ?? 0,
-    amount: row.f6 ?? 0,
-    mainNetInflow: row.f62 ?? 0,
-    mainNetInflowPct: row.f184 ?? 0,
-    high: row.f15 ?? 0,
-    low: row.f16 ?? 0,
-    industry: lookupIndustry(row.f12) ?? '未知',
-    isST: row.f14.includes('ST'),
+    price: toNumber(row.f2),
+    pctChange: toNumber(row.f3),
+    turnoverRate: toNumber(row.f8),
+    amount: toNumber(row.f6),
+    mainNetInflow: toNumber(row.f62),
+    mainNetInflowPct: toNumber(row.f184),
+    high: toNumber(row.f15),
+    low: toNumber(row.f16),
+    industry: lookupIndustry(code) ?? '未知',
+    isST: name.includes('ST'),
   };
 }
 

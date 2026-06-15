@@ -36,7 +36,7 @@ export function StockTable({ stocks, sort, onSort }: StockTableProps) {
 
   return (
     <section className="bg-surface border border-border rounded-lg overflow-x-auto">
-      <table className="w-full border-collapse text-[13px]">
+      <table className="w-full border-collapse text-[15px]">
         <thead>
           <tr>
             <SortableTh label="代码" sortKey="code" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} />

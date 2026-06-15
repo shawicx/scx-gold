@@ -9,7 +9,7 @@ const TYPE_CLASS: Record<Clue['type'], string> = {
 export function ClueTag({ clue }: { clue: Clue }) {
   return (
     <span
-      className={`inline-block px-1.5 py-0.5 text-[11px] rounded-sm ${TYPE_CLASS[clue.type]}`}
+      className={`inline-block px-1.5 py-0.5 text-[13px] rounded-sm ${TYPE_CLASS[clue.type]}`}
     >
       {clue.label}
     </span>

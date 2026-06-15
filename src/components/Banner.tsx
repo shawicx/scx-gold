@@ -20,7 +20,7 @@ export function Banner({ type, message, onAction, actionLabel }: BannerProps) {
   return (
     <div
       ref={ref}
-      className={`flex items-center justify-between px-3 py-2 rounded-md mb-3 text-[13px] border ${TYPE_CLASS[type]}`}
+      className={`flex items-center justify-between px-3 py-2 rounded-md mb-3 text-[15px] border ${TYPE_CLASS[type]}`}
     >
       <span>{message}</span>
       {onAction && actionLabel && (

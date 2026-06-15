@@ -32,7 +32,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
           {(['main', 'all'] as BoardScope[]).map((scope) => (
             <button
               key={scope}
-              className={`px-2.5 py-1 text-[13px] ${filters.boardScope === scope ? 'bg-accent text-white' : 'bg-surface text-text'}`}
+              className={`px-2.5 py-1 text-[15px] ${filters.boardScope === scope ? 'bg-accent text-white' : 'bg-surface text-text'}`}
               onClick={() => setBoardScope(scope)}
             >
               {scope === 'main' ? '主板' : '全部 A 股'}
@@ -46,7 +46,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         <input
           type="number"
           step="0.1"
-          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[13px]"
+          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[15px]"
           value={filters.pctRange[0]}
           onChange={(e) => handlePctChange(0, e.target.value)}
         />
@@ -54,7 +54,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         <input
           type="number"
           step="0.1"
-          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[13px]"
+          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[15px]"
           value={filters.pctRange[1]}
           onChange={(e) => handlePctChange(1, e.target.value)}
         />
@@ -64,7 +64,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-text-secondary">主力资金</span>
         <select
-          className="px-2 py-1 bg-bg text-text border border-border rounded text-[13px]"
+          className="px-2 py-1 bg-bg text-text border border-border rounded text-[15px]"
           value={filters.minMainInflow}
           onChange={(e) => setMinMainInflow(Number(e.target.value))}
         >
@@ -77,7 +77,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
       </div>
 
       <div className="flex items-center gap-1.5">
-        <label className="flex items-center gap-1 text-[13px] cursor-pointer">
+        <label className="flex items-center gap-1 text-[15px] cursor-pointer">
           <input
             type="checkbox"
             checked={filters.excludeST}
@@ -94,7 +94,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
           </span>
         )}
         <button
-          className="px-3.5 py-1.5 bg-accent text-white border-none rounded text-[13px] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-3.5 py-1.5 bg-accent text-white border-none rounded text-[15px] disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={onRefresh}
           disabled={loading}
         >

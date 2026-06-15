@@ -20,7 +20,6 @@ export function useFlipSort<T extends HTMLElement>(
 
     Flip.from(prevState, {
       duration: 0.4,
-      absolute: true,
       ease: 'power2.inOut',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -25,14 +25,14 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
   };
 
   return (
-    <section className="filter-bar">
-      <div className="filter-bar__group">
-        <span className="filter-bar__label">板块</span>
-        <div className="seg-control">
+    <section className="flex flex-wrap items-center gap-4 p-3 bg-surface border border-border rounded-lg mb-4">
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-text-secondary">板块</span>
+        <div className="inline-flex border border-border rounded overflow-hidden divide-x divide-border">
           {(['main', 'all'] as BoardScope[]).map((scope) => (
             <button
               key={scope}
-              className={`seg-control__btn ${filters.boardScope === scope ? 'seg-control__btn--active' : ''}`}
+              className={`px-2.5 py-1 text-[13px] ${filters.boardScope === scope ? 'bg-accent text-white' : 'bg-surface text-text'}`}
               onClick={() => setBoardScope(scope)}
             >
               {scope === 'main' ? '主板' : '全部 A 股'}
@@ -41,30 +41,30 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </div>
       </div>
 
-      <div className="filter-bar__group">
-        <span className="filter-bar__label">涨幅区间</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-text-secondary">涨幅区间</span>
         <input
           type="number"
           step="0.1"
-          className="filter-bar__num"
+          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[13px]"
           value={filters.pctRange[0]}
           onChange={(e) => handlePctChange(0, e.target.value)}
         />
-        <span className="filter-bar__sep">~</span>
+        <span className="text-text-secondary">~</span>
         <input
           type="number"
           step="0.1"
-          className="filter-bar__num"
+          className="w-[60px] px-1.5 py-1 bg-bg text-text border border-border rounded text-[13px]"
           value={filters.pctRange[1]}
           onChange={(e) => handlePctChange(1, e.target.value)}
         />
-        <span className="filter-bar__suffix">%</span>
+        <span className="text-text-secondary text-xs">%</span>
       </div>
 
-      <div className="filter-bar__group">
-        <span className="filter-bar__label">主力资金</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-text-secondary">主力资金</span>
         <select
-          className="filter-bar__select"
+          className="px-2 py-1 bg-bg text-text border border-border rounded text-[13px]"
           value={filters.minMainInflow}
           onChange={(e) => setMinMainInflow(Number(e.target.value))}
         >
@@ -76,8 +76,8 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </select>
       </div>
 
-      <div className="filter-bar__group">
-        <label className="filter-bar__check">
+      <div className="flex items-center gap-1.5">
+        <label className="flex items-center gap-1 text-[13px] cursor-pointer">
           <input
             type="checkbox"
             checked={filters.excludeST}
@@ -87,14 +87,14 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </label>
       </div>
 
-      <div className="filter-bar__group filter-bar__group--right">
+      <div className="flex items-center gap-1.5 ml-auto">
         {isTrading && (
-          <span className="filter-bar__status filter-bar__status--trading">
+          <span className="text-xs px-2 py-0.5 rounded bg-[rgba(16,185,129,0.15)] text-down">
             交易中
           </span>
         )}
         <button
-          className="filter-bar__refresh"
+          className="px-3.5 py-1.5 bg-accent text-white border-none rounded text-[13px] disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={onRefresh}
           disabled={loading}
         >

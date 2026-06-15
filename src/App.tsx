@@ -16,7 +16,7 @@ function AppInner() {
   const sort = useSort();
 
   return (
-    <div className="app">
+    <div className="max-w-[2560px] mx-auto px-5 pt-4 pb-10">
       <Header
         lastUpdated={screener.lastUpdated}
         isStale={screener.isStale}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { fetchStocks } from '../api/stocks';
+import { fetchAllStocks } from '../service/stockListAdapter';
 import type { FilterState, Stock } from '../types';
 
 interface ScreenerState {
@@ -30,7 +30,7 @@ export function useScreener(
     setLoading(true);
     setError(null);
     try {
-      const stocks = await fetchStocks({ boardScope: filters.boardScope });
+      const stocks = await fetchAllStocks(filters.boardScope);
       setAllStocks(stocks);
       setLastUpdated(new Date());
       setIsStale(false);

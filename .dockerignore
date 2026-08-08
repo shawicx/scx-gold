@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-ssr
+.git
+.github
+.remember
+.env
+.env.*
+.vscode
+.coverage
+*.log
+docs

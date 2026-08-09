@@ -47,28 +47,31 @@ export function adaptStockListItem(item: StockListItem): Stock {
 }
 
 /**
- * 从后端拉取全量股票行情（自动分页拉满），返回前端 Stock[]。
+ * 从后端拉取股票行情（增量分页 + 提前终止），返回前端 Stock[]。
  *
- * 后端单页 ≤100 条，前端筛选器需要全量数据。此函数循环拉取直到
- * 取满 total，然后一次性转为 Stock[]。
+ * 策略：按 change_pct 降序分页拉取，遇到涨幅明显低于涨停阈值（9.5%）
+ * 的股票就停止——涨停候选股一定排在最前面，无需拉完全市场 5500 条。
+ * 这样通常只需 1-3 页（100-300 条），将请求时间从 30s 降到 3-5s。
  *
  * @param boardScope 板块范围（主板/全部 A 股），映射为后端 market 参数。
- * @returns 全量 Stock 列表。
+ * @returns Stock 列表（涨停候选 + 少量缓冲）。
  */
 export async function fetchAllStocks(boardScope: BoardScope): Promise<Stock[]> {
   const { getApiV1StockListFunc } = await import('@/service/GeGu');
 
-  // 后端 market 参数：主板 → "全部"（再按代码前缀在前端无需过滤，
-  // 因为前端筛选逻辑依赖完整数据）；全部 A 股 → "全部"
-  // 注意：后端的"全部"已包含全部 A 股（上证+深证+创业板+科创板+北交所）
+  // 后端的"全部"已包含全部 A 股（上证+深证+创业板+科创板+北交所）
   const market = '全部';
 
+  // 涨停筛选下限：低于此涨幅的股票一定不是涨停候选，停止拉取
+  // 用 9.5% 而非 9.8%，留一点缓冲（接近涨停的也展示）
+  const STOP_THRESHOLD = 9.5;
+
   const PAGE_SIZE = 100;
+  const MAX_PAGES = 10; // 安全阀：最多拉 10 页（1000 条）
   let page = 1;
-  let total = Infinity;
   const allItems: StockListItem[] = [];
 
-  while (allItems.length < total) {
+  for (page = 1; page <= MAX_PAGES; page += 1) {
     const data = await getApiV1StockListFunc({
       market,
       type: 'stock',
@@ -77,11 +80,14 @@ export async function fetchAllStocks(boardScope: BoardScope): Promise<Stock[]> {
       page,
       page_size: PAGE_SIZE,
     });
-    allItems.push(...data.items);
-    total = data.total;
-    // 安全阀：防止异常情况下无限循环
+
     if (data.items.length === 0) break;
-    page += 1;
+    allItems.push(...data.items);
+
+    // 提前终止：本页最后一条（涨幅最低的一条）已低于阈值，无需再拉
+    const lastItem = data.items[data.items.length - 1];
+    const lastPct = lastItem.change_pct ?? -Infinity;
+    if (lastPct < STOP_THRESHOLD) break;
   }
 
   // boardScope="main" 时只保留主板（上证 6 开头非 688 + 深证 0 开头）

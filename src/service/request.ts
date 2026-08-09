@@ -18,8 +18,11 @@ export interface RequestConfig extends AxiosRequestConfig {
   pathParams?: Record<string, string | number>;
 }
 
-/** 超时时间（毫秒） */
-const TIMEOUT = 10 * 1000;
+/** 超时时间（毫秒）
+ * 后端拉取全市场行情（新浪源分页拉 70 页）需要 25-30 秒，
+ * 此超时需覆盖最慢路径；前端 adapter 有提前终止逻辑，正常会更快。
+ */
+const TIMEOUT = 90 * 1000;
 
 /**
  * @description 后端业务错误（code !== 0 或 HTTP 非 2xx）。

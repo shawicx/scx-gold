@@ -6,4 +6,5 @@ export * from './GeGu';
 export * from './SouSuo';
 export * from './BanKuai';
 export * from './DaPan';
+export * from './FenXi';
 export * from './types';

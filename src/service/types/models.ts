@@ -143,3 +143,53 @@ export interface SearchResult {
   type: string;
   score: number;
 }
+
+// ---------------------------------------------------------------------------
+// 支撑位分析
+// ---------------------------------------------------------------------------
+
+/**
+ * 单个支撑/压力位（对应后端 SupportLevel）。
+ */
+export interface SupportLevel {
+  /** 价位 */
+  price: number;
+  /** 命中来源列表（如 MA20、BOLL下轨、20日低点） */
+  sources: string[];
+  /** 距离当前价的百分比（支撑为负，压力为正） */
+  distance_pct: number;
+  /** 强度标签：强 / 中 / 弱 */
+  strength: string;
+}
+
+/**
+ * 单只标的的完整分析结果（对应后端 AnalysisReport）。
+ */
+export interface AnalysisReport {
+  code: string;
+  name: string;
+  trade_date: string | null;
+  close: number | null;
+  change_pct: number | null;
+  support_1: SupportLevel | null;
+  support_2: SupportLevel | null;
+  resistance_1: SupportLevel | null;
+  trend: string;
+  ma20: number | null;
+  ma60: number | null;
+  summary: string;
+  ok: boolean;
+  error: string;
+}
+
+/**
+ * 分析任务汇总结果（后端 /analysis/run 的 data 结构）。
+ */
+export interface AnalysisResult {
+  analyzed: number;
+  success: number;
+  failed: number;
+  sent: boolean;
+  reports: AnalysisReport[];
+  elapsed: number;
+}

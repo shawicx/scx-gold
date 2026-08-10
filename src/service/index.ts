@@ -9,4 +9,5 @@ export * from './DaPan';
 export * from './FenXi';
 export * from './Watchlist';
 export * from './Settings';
+export * from './Gold';
 export * from './types';

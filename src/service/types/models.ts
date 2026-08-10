@@ -145,8 +145,29 @@ export interface SearchResult {
 }
 
 // ---------------------------------------------------------------------------
-// 支撑位分析
+// 黄金行情
 // ---------------------------------------------------------------------------
+
+/**
+ * 黄金品种实时行情（对应后端 GoldQuote）。
+ */
+export interface GoldQuote {
+  code: string;
+  name: string;
+  /** 分类：futures_shfe / spot_sge / comex_proxy */
+  category: string;
+  price: number | null;
+  change: number | null;
+  change_pct: number | null;
+  prev_close: number | null;
+  prev_settlement: number | null;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+  position: number | null;
+  timestamp: string | null;
+}
 
 /**
  * 单个支撑/压力位（对应后端 SupportLevel）。

@@ -12,6 +12,7 @@ import { NavBar } from './components/NavBar';
 import { ThemeProvider } from './context/ThemeContext';
 import { WatchlistProvider } from './context/WatchlistContext';
 import { EtfAnalysisPage } from './pages/EtfAnalysisPage';
+import { GoldPage } from './pages/GoldPage';
 import { ScreenerPage } from './pages/ScreenerPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -24,6 +25,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<ScreenerPage />} />
             <Route path="/etf-analysis" element={<EtfAnalysisPage />} />
+            <Route path="/gold" element={<GoldPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </WatchlistProvider>

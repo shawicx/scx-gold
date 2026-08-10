@@ -4,11 +4,14 @@
  * 配置存后端 DB，保存后即时生效（无需重启）。
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Banner } from '@/components/Banner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
+  getAdminTaskFunc,
   getApiV1SettingsFunc,
+  postAdminReindexFunc,
+  postAdminSyncFunc,
   postApiV1SettingsTestLlmFunc,
   putApiV1SettingsFunc,
   type SettingsUpdateRequest,
@@ -31,6 +34,80 @@ export function SettingsPage() {
 
   // 本地编辑缓冲（用户输入未保存的值）
   const [draft, setDraft] = useState<SettingsUpdateRequest>({});
+
+  // 运维操作状态
+  const [syncing, setSyncing] = useState(false);
+  const [reindexing, setReindexing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [syncProgress, setSyncProgress] = useState<string | null>(null);
+  const [reindexResult, setReindexResult] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    setSyncProgress('正在提交任务…');
+    try {
+      // 1. 提交任务，立即拿到 task_id
+      const submitResult = await postAdminSyncFunc();
+      const taskId = submitResult.task_id;
+
+      // 2. 轮询任务状态，每 3 秒一次
+      const poll = async () => {
+        try {
+          const info = await getAdminTaskFunc(taskId);
+          setSyncProgress(`${info.progress}（已耗时 ${info.elapsed}s）`);
+
+          if (info.status === 'done') {
+            const r = info.result || {};
+            setSyncResult(
+              `✓ 同步完成：股票 ${r.stock_count ?? '--'}，ETF ${r.etf_count ?? '--'}，行业 ${r.industry_count ?? '--'}，索引 ${r.index_size ?? '--'}`,
+            );
+            setSyncing(false);
+            setSyncProgress(null);
+            return;
+          }
+          if (info.status === 'failed') {
+            setSyncResult(`✗ 同步失败：${info.error}`);
+            setSyncing(false);
+            setSyncProgress(null);
+            return;
+          }
+          // pending / running：继续轮询
+          pollRef.current = setTimeout(poll, 3000);
+        } catch (e) {
+          setSyncResult(`✗ 查询进度失败：${e instanceof Error ? e.message : '未知错误'}`);
+          setSyncing(false);
+          setSyncProgress(null);
+        }
+      };
+      pollRef.current = setTimeout(poll, 1000);
+    } catch (e) {
+      setSyncResult(`✗ 提交任务失败：${e instanceof Error ? e.message : '未知错误'}`);
+      setSyncing(false);
+      setSyncProgress(null);
+    }
+  };
+
+  // 组件卸载时清理轮询定时器
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearTimeout(pollRef.current);
+    };
+  }, []);
+
+  const handleReindex = async () => {
+    setReindexing(true);
+    setReindexResult(null);
+    try {
+      const result = await postAdminReindexFunc();
+      setReindexResult(`✓ 重建索引完成：共 ${result.index_size} 条`);
+    } catch (e) {
+      setReindexResult(`✗ 重建失败：${e instanceof Error ? e.message : '未知错误'}`);
+    } finally {
+      setReindexing(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -288,6 +365,62 @@ export function SettingsPage() {
               className="w-full bg-bg border border-border rounded-md px-3 py-2 text-sm outline-none focus:border-accent font-mono"
             />
           </div>
+        </div>
+      </section>
+
+      {/* 运维操作 */}
+      <section className="bg-surface border border-border rounded-lg p-5 shadow-[var(--shadow)] mb-4">
+        <h2 className="text-base font-semibold m-0 mb-2">运维操作</h2>
+        <p className="text-xs text-text-muted mb-4 m-0">
+          全量同步会从数据源拉取股票/ETF/行业映射并重建搜索索引，耗时约 1~2 分钟。
+          重建索引仅从数据库重新加载，不拉取数据源，耗时几秒。
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => void handleSync()}
+            disabled={syncing}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              syncing
+                ? 'bg-surface-hover text-text-muted cursor-not-allowed'
+                : 'bg-surface border border-accent text-accent hover:bg-accent hover:text-white'
+            }`}
+          >
+            {syncing ? '同步中…' : '全量同步'}
+          </button>
+          {syncProgress && (
+            <span className="text-sm text-accent">{syncProgress}</span>
+          )}
+          {syncResult && (
+            <span
+              className={`text-sm ${
+                syncResult.startsWith('✓') ? 'text-down' : 'text-error'
+              }`}
+            >
+              {syncResult}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3 mt-3">
+          <button
+            onClick={() => void handleReindex()}
+            disabled={reindexing}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              reindexing
+                ? 'bg-surface-hover text-text-muted cursor-not-allowed'
+                : 'bg-surface border border-accent text-accent hover:bg-accent hover:text-white'
+            }`}
+          >
+            {reindexing ? '重建中…' : '重建搜索索引'}
+          </button>
+          {reindexResult && (
+            <span
+              className={`text-sm ${
+                reindexResult.startsWith('✓') ? 'text-down' : 'text-error'
+              }`}
+            >
+              {reindexResult}
+            </span>
+          )}
         </div>
       </section>
 

@@ -19,10 +19,10 @@ export interface RequestConfig extends AxiosRequestConfig {
 }
 
 /** 超时时间（毫秒）
- * 后端拉取全市场行情（新浪源分页拉 70 页）需要 25-30 秒，
- * 此超时需覆盖最慢路径；前端 adapter 有提前终止逻辑，正常会更快。
+ * 全量同步等长耗时操作已改为异步任务模式（提交后轮询），
+ * 此超时仅覆盖普通请求与重建索引等秒级操作。
  */
-const TIMEOUT = 90 * 1000;
+const TIMEOUT = 120 * 1000;
 
 /**
  * @description 后端业务错误（code !== 0 或 HTTP 非 2xx）。

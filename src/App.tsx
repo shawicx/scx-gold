@@ -13,6 +13,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { WatchlistProvider } from './context/WatchlistContext';
 import { EtfAnalysisPage } from './pages/EtfAnalysisPage';
 import { ScreenerPage } from './pages/ScreenerPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<ScreenerPage />} />
             <Route path="/etf-analysis" element={<EtfAnalysisPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </WatchlistProvider>
       </BrowserRouter>

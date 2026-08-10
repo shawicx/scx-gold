@@ -4,9 +4,11 @@
  * 布局：左右分栏（大屏）/ 上下堆叠（小屏）
  *   - 左/上：关注列表（搜索 + 管理）
  *   - 右/下：开始分析按钮 + 结果展示（卡片网格 + 汇总表格 Tab 切换）
+ *
+ * 页面加载时先从 DB 读取最新报告（不触发重算），点击「开始分析」才强制重算。
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AnalysisReportCard } from '@/components/AnalysisReportCard';
 import { AnalysisTable } from '@/components/AnalysisTable';
@@ -15,19 +17,48 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Watchlist } from '@/components/Watchlist';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { useWatchlist } from '@/context/WatchlistContext';
+import { getApiV1AnalysisLatestFunc } from '@/service';
+import type { AnalysisReport } from '@/service/types';
 
 type ViewMode = 'cards' | 'table';
 
 export function EtfAnalysisPage() {
-  const { items } = useWatchlist();
+  const { items, loading: watchlistLoading } = useWatchlist();
   const codes = items.map((it) => it.code);
   const analysis = useAnalysis(codes);
   const [view, setView] = useState<ViewMode>('cards');
 
-  const { result, loading, error, run } = analysis;
-  const reports = result?.reports ?? [];
+  // 从 DB 加载的最新报告（页面初始化展示，不触发重算）
+  const [cachedReports, setCachedReports] = useState<AnalysisReport[] | null>(null);
 
-  // 构建关注列表的 code → name 映射，用于补全后端未返回的名称
+  const { result, loading, error, run } = analysis;
+
+  // codes 每次渲染都是新数组引用，用 join 后的字符串作为 effect 依赖避免无限循环
+  const codesKey = codes.join(',');
+
+  // 关注列表加载完成后，从 DB 读取最新报告
+  useEffect(() => {
+    if (watchlistLoading || codes.length === 0) {
+      setCachedReports(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const reports = await getApiV1AnalysisLatestFunc(codesKey);
+        if (!cancelled) setCachedReports(reports);
+      } catch {
+        if (!cancelled) setCachedReports(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codesKey, watchlistLoading]);
+
+  // 分析结果优先用刚触发的 result，无则用 DB 缓存
+  const reports = result?.reports ?? cachedReports ?? [];
   const nameMap = new Map(items.map((it) => [it.code, it.name]));
 
   return (
@@ -103,7 +134,7 @@ export function EtfAnalysisPage() {
           )}
 
           {/* 空状态 */}
-          {!result && !loading && !error && (
+          {reports.length === 0 && !loading && !error && (
             <div className="bg-surface border border-border rounded-lg p-8 text-center">
               <p className="text-text-secondary m-0">
                 点击「开始分析」获取关注标的的支撑位分析报告

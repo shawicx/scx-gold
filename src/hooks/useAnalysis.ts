@@ -23,15 +23,19 @@ export function useAnalysis(codes: string[]): AnalysisState {
   const [error, setError] = useState<string | null>(null);
   const inFlight = useRef(false);
 
+  // codes 每次渲染都是新数组引用，用 join 后的字符串作为依赖避免函数频繁重建
+  const codesKey = codes.join(',');
+
   const run = useCallback(async () => {
     if (inFlight.current) return;
     inFlight.current = true;
     setLoading(true);
     setError(null);
     try {
+      const codesList = codesKey ? codesKey.split(',') : [];
       const data = await postApiV1AnalysisRunFunc({
         dry_run: true,
-        codes: codes.length > 0 ? codes.join(',') : undefined,
+        codes: codesList.length > 0 ? codesKey : undefined,
       });
       setResult(data);
     } catch (e) {
@@ -46,7 +50,7 @@ export function useAnalysis(codes: string[]): AnalysisState {
       setLoading(false);
       inFlight.current = false;
     }
-  }, [codes]);
+  }, [codesKey]);
 
   return { result, loading, error, run };
 }

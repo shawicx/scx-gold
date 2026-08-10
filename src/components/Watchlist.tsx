@@ -19,7 +19,7 @@ export function Watchlist() {
         </h2>
         {items.length > 0 && (
           <button
-            onClick={clear}
+            onClick={() => void clear()}
             className="text-xs text-text-muted hover:text-error transition-colors"
           >
             清空
@@ -51,7 +51,7 @@ export function Watchlist() {
                 </span>
               </div>
               <button
-                onClick={() => remove(item.code)}
+                onClick={() => void remove(item.code)}
                 className="ml-2 text-text-muted hover:text-error opacity-0 group-hover:opacity-100 transition-all shrink-0"
                 aria-label={`移除 ${item.name}`}
                 title="移除"
@@ -64,7 +64,7 @@ export function Watchlist() {
       )}
 
       <p className="mt-3 text-xs text-text-muted leading-relaxed m-0">
-        提示：分析时后端读取自身配置的关注列表（SCX_WATCHLIST），需与后端 .env 保持一致。
+        提示：关注列表保存在后端数据库，每日 21:00 自动分析并发送邮件。
       </p>
     </div>
   );

@@ -1,8 +1,8 @@
 /**
- * @description 关注列表 Context，localStorage 持久化。
+ * @description 关注列表 Context，数据源为后端 DB（/api/v1/watchlist）。
  *
- * 与后端 V1 配置文件驱动策略匹配：前端管理关注列表，分析时后端读自身配置。
- * 数据结构：{ code: string; name: string }[]
+ * 页面加载时从后端拉取关注列表，增删时同步到后端。
+ * localStorage 作为离线缓存兜底（后端不可达时）。
  */
 
 import {
@@ -13,82 +13,145 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-
-/** 关注条目 */
-export interface WatchlistItem {
-  /** 证券代码 */
-  code: string;
-  /** 简称 */
-  name: string;
-}
+import {
+  deleteApiV1WatchlistByCodeFunc,
+  getApiV1WatchlistFunc,
+  postApiV1WatchlistFunc,
+  putApiV1WatchlistFunc,
+} from '@/service';
+import type { WatchlistItemData } from '@/service/types';
 
 const STORAGE_KEY = 'scx-gold.watchlist';
 
-/** 首次使用时的默认关注列表（常见宽基/行业 ETF） */
-const DEFAULT_WATCHLIST: WatchlistItem[] = [
-  { code: '510300', name: '沪深300ETF' },
-  { code: '159915', name: '创业板ETF' },
-  { code: '512100', name: '中证1000ETF' },
+/** 首次使用或后端不可达时的默认关注列表 */
+const DEFAULT_WATCHLIST: WatchlistItemData[] = [
+  { code: '510300', name: '沪深300ETF', sort_order: 0 },
+  { code: '159915', name: '创业板ETF', sort_order: 1 },
+  { code: '512100', name: '中证1000ETF', sort_order: 2 },
 ];
 
 interface WatchlistContextValue {
-  /** 关注列表 */
-  items: WatchlistItem[];
-  /** 添加关注（已存在则忽略） */
-  add: (item: WatchlistItem) => void;
-  /** 移除关注 */
-  remove: (code: string) => void;
-  /** 是否已关注 */
+  items: WatchlistItemData[];
+  loading: boolean;
+  add: (code: string, name?: string) => Promise<void>;
+  remove: (code: string) => Promise<void>;
   has: (code: string) => boolean;
-  /** 清空关注列表 */
-  clear: () => void;
+  clear: () => Promise<void>;
 }
 
 const WatchlistContext = createContext<WatchlistContextValue | null>(null);
 
-/** 从 localStorage 读取关注列表，无则用默认列表 */
-function loadItems(): WatchlistItem[] {
+/** 从 localStorage 读取缓存（后端不可达时兜底） */
+function loadCached(): WatchlistItemData[] {
   if (typeof window === 'undefined') return DEFAULT_WATCHLIST;
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (!raw) return DEFAULT_WATCHLIST;
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return DEFAULT_WATCHLIST;
-    return parsed.filter(
-      (it): it is WatchlistItem =>
-        typeof it?.code === 'string' && typeof it?.name === 'string',
-    );
+    return Array.isArray(parsed) ? parsed : DEFAULT_WATCHLIST;
   } catch {
     return DEFAULT_WATCHLIST;
   }
 }
 
 export function WatchlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WatchlistItem[]>(loadItems);
+  const [items, setItems] = useState<WatchlistItemData[]>(loadCached);
+  const [loading, setLoading] = useState(true);
 
+  // 启动时从后端加载（仅在首次使用——后端无可达且 localStorage 无缓存时——回退默认值）
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
-
-  const add = useCallback((item: WatchlistItem) => {
-    setItems((prev) =>
-      prev.some((it) => it.code === item.code) ? prev : [...prev, item],
-    );
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getApiV1WatchlistFunc();
+        if (!cancelled) {
+          // 后端可达：信任返回值（空数组表示用户主动清空过，不用默认值覆盖）
+          // 仅当后端返回空且本地也无缓存时，才用默认值（首次使用场景）
+          let list = data;
+          if (data.length === 0) {
+            const cached = loadCached();
+            list = cached.length > 0 ? [] : DEFAULT_WATCHLIST;
+          }
+          setItems(list);
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        }
+      } catch {
+        // 后端不可达：首次加载用 localStorage 缓存
+        if (!cancelled) {
+          setItems(loadCached());
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const remove = useCallback((code: string) => {
-    setItems((prev) => prev.filter((it) => it.code !== code));
+  const persist = useCallback((list: WatchlistItemData[]) => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }, []);
+
+  const add = useCallback(
+    async (code: string, name?: string) => {
+      if (items.some((it) => it.code === code)) return;
+      // 乐观更新
+      const optimistic: WatchlistItemData = {
+        code,
+        name: name || code,
+        sort_order: items.length,
+      };
+      const next = [...items, optimistic];
+      setItems(next);
+      persist(next);
+      try {
+        const result = await postApiV1WatchlistFunc(code, name);
+        // 用后端返回的补全名称更新
+        setItems((prev) =>
+          prev.map((it) =>
+            it.code === code ? { ...it, name: result.name || it.name } : it,
+          ),
+        );
+      } catch {
+        // 同步失败保持乐观状态（下次加载会纠正）
+      }
+    },
+    [items, persist],
+  );
+
+  const remove = useCallback(
+    async (code: string) => {
+      const next = items.filter((it) => it.code !== code);
+      setItems(next);
+      persist(next);
+      try {
+        await deleteApiV1WatchlistByCodeFunc(code);
+      } catch {
+        // 同步失败保持乐观状态
+      }
+    },
+    [items, persist],
+  );
 
   const has = useCallback(
     (code: string) => items.some((it) => it.code === code),
     [items],
   );
 
-  const clear = useCallback(() => setItems([]), []);
+  const clear = useCallback(async () => {
+    setItems([]);
+    window.localStorage.removeItem(STORAGE_KEY);
+    // 用整体替换传空列表清空后端（比逐个删除更可靠）
+    try {
+      await putApiV1WatchlistFunc([]);
+    } catch {
+      // 同步失败保持乐观状态
+    }
+  }, []);
 
   return (
-    <WatchlistContext.Provider value={{ items, add, remove, has, clear }}>
+    <WatchlistContext.Provider value={{ items, loading, add, remove, has, clear }}>
       {children}
     </WatchlistContext.Provider>
   );

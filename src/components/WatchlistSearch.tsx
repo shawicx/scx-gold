@@ -100,7 +100,7 @@ export function WatchlistSearch() {
                 <button
                   disabled={added}
                   onClick={() => {
-                    add({ code: r.code, name: r.name });
+                    void add(r.code, r.name);
                     setQuery('');
                     setResults([]);
                     setOpen(false);

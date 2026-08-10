@@ -193,3 +193,47 @@ export interface AnalysisResult {
   reports: AnalysisReport[];
   elapsed: number;
 }
+
+// ---------------------------------------------------------------------------
+// 关注列表
+// ---------------------------------------------------------------------------
+
+/**
+ * 关注列表条目（对应后端 WatchlistItem）。
+ */
+export interface WatchlistItemData {
+  code: string;
+  name: string;
+  sort_order: number;
+}
+
+// ---------------------------------------------------------------------------
+// 应用配置
+// ---------------------------------------------------------------------------
+
+/**
+ * 应用配置（GET 返回时敏感字段已脱敏）。
+ */
+export interface AppSettings {
+  llm_provider: string | null;
+  llm_api_key: string | null;
+  llm_base_url: string | null;
+  llm_model: string | null;
+  llm_timeout: string | null;
+  smtp_host: string | null;
+  smtp_port: string | null;
+  smtp_user: string | null;
+  smtp_password: string | null;
+  smtp_from_name: string | null;
+  smtp_use_ssl: string | null;
+  notify_emails: string | null;
+}
+
+/**
+ * LLM 测试连接结果。
+ */
+export interface LlmTestResult {
+  success: boolean;
+  message: string;
+  reply: string;
+}

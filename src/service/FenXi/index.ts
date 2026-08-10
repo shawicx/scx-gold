@@ -3,7 +3,7 @@
  */
 
 import { request } from '@/service/request';
-import type { AnalysisResult } from '@/service/types';
+import type { AnalysisReport, AnalysisResult } from '@/service/types';
 
 /**
  * 分析请求参数。
@@ -32,5 +32,39 @@ export async function postApiV1AnalysisRunFunc(
     url: '/api/v1/analysis/run',
     method: 'POST',
     params,
+  });
+}
+
+/**
+ * @description 获取最新分析报告（从 DB 读取，不触发重算）。
+ *
+ * @param codes 指定代码（逗号分隔）；不传则返回关注列表的最新报告。
+ * @returns AnalysisReport 列表。
+ */
+export async function getApiV1AnalysisLatestFunc(
+  codes?: string,
+): Promise<AnalysisReport[]> {
+  return request<AnalysisReport[]>({
+    url: '/api/v1/analysis/latest',
+    method: 'GET',
+    params: codes ? { codes } : undefined,
+  });
+}
+
+/**
+ * @description 获取某只标的历史分析报告。
+ *
+ * @param code 证券代码。
+ * @param limit 最大返回数。
+ * @returns AnalysisReport 列表（最新在前）。
+ */
+export async function getApiV1AnalysisHistoryFunc(
+  code: string,
+  limit?: number,
+): Promise<AnalysisReport[]> {
+  return request<AnalysisReport[]>({
+    url: '/api/v1/analysis/history',
+    method: 'GET',
+    params: { code, ...(limit ? { limit } : {}) },
   });
 }

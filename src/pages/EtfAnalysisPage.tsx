@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { AnalysisReportCard } from '@/components/AnalysisReportCard';
 import { AnalysisTable } from '@/components/AnalysisTable';
 import { Banner } from '@/components/Banner';
+import { HistoryDrawer } from '@/components/HistoryDrawer';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Watchlist } from '@/components/Watchlist';
 import { useAnalysis } from '@/hooks/useAnalysis';
@@ -60,6 +61,14 @@ export function EtfAnalysisPage() {
   // 分析结果优先用刚触发的 result，无则用 DB 缓存
   const reports = result?.reports ?? cachedReports ?? [];
   const nameMap = new Map(items.map((it) => [it.code, it.name]));
+
+  // 历史 Drawer 状态
+  const [historyCode, setHistoryCode] = useState<string | null>(null);
+  const historyName = historyCode
+    ? reports.find((r) => r.code === historyCode)?.name ||
+      nameMap.get(historyCode) ||
+      historyCode
+    : '';
 
   return (
     <div className="max-w-[2560px] mx-auto px-5 pt-4 pb-10">
@@ -169,6 +178,7 @@ export function EtfAnalysisPage() {
                       key={r.code}
                       report={r}
                       fallbackName={nameMap.get(r.code)}
+                      onHistory={setHistoryCode}
                     />
                   ))}
                 </div>
@@ -179,6 +189,14 @@ export function EtfAnalysisPage() {
           )}
         </div>
       </div>
+
+      {/* 历史分析 Drawer */}
+      <HistoryDrawer
+        open={historyCode !== null}
+        code={historyCode}
+        name={historyName}
+        onClose={() => setHistoryCode(null)}
+      />
     </div>
   );
 }

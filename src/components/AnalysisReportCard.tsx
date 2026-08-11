@@ -65,9 +65,12 @@ function PriceRow({
 export function AnalysisReportCard({
   report,
   fallbackName,
+  onHistory,
 }: {
   report: AnalysisReport;
   fallbackName?: string;
+  /** 点击「查看历史」按钮的回调 */
+  onHistory?: (code: string) => void;
 }) {
   // 名称优先用后端返回，为空时回退到前端关注列表中的名称
   const displayName = report.name || fallbackName || report.code;
@@ -151,6 +154,18 @@ export function AnalysisReportCard({
           <p className="text-sm text-text leading-relaxed m-0 whitespace-pre-wrap">
             {report.summary}
           </p>
+        </div>
+      )}
+
+      {/* 历史入口 */}
+      {onHistory && (
+        <div className="mt-3 pt-3 border-t border-border flex justify-end">
+          <button
+            onClick={() => onHistory(report.code)}
+            className="text-xs text-accent hover:underline"
+          >
+            查看历史 →
+          </button>
         </div>
       )}
     </div>

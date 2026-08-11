@@ -13,6 +13,7 @@ import {
   postAdminReindexFunc,
   postAdminSyncFunc,
   postApiV1SettingsTestLlmFunc,
+  postApiV1SettingsTestSmtpFunc,
   putApiV1SettingsFunc,
   type SettingsUpdateRequest,
 } from '@/service';
@@ -31,6 +32,23 @@ export function SettingsPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [smtpTesting, setSmtpTesting] = useState(false);
+  const [smtpTestResult, setSmtpTestResult] = useState<string | null>(null);
+
+  const handleTestSmtp = async () => {
+    setSmtpTesting(true);
+    setSmtpTestResult(null);
+    try {
+      const result = await postApiV1SettingsTestSmtpFunc();
+      setSmtpTestResult(
+        result.success ? `✓ ${result.message}` : `✗ ${result.message}`,
+      );
+    } catch (e) {
+      setSmtpTestResult(`✗ 测试失败：${e instanceof Error ? e.message : '未知错误'}`);
+    } finally {
+      setSmtpTesting(false);
+    }
+  };
 
   // 本地编辑缓冲（用户输入未保存的值）
   const [draft, setDraft] = useState<SettingsUpdateRequest>({});
@@ -364,6 +382,30 @@ export function SettingsPage() {
               placeholder="you@example.com"
               className="w-full bg-bg border border-border rounded-md px-3 py-2 text-sm outline-none focus:border-accent font-mono"
             />
+          </div>
+
+          {/* 测试发信 */}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => void handleTestSmtp()}
+              disabled={smtpTesting}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                smtpTesting
+                  ? 'bg-surface-hover text-text-muted cursor-not-allowed'
+                  : 'bg-surface border border-accent text-accent hover:bg-accent hover:text-white'
+              }`}
+            >
+              {smtpTesting ? '发送中…' : '发送测试邮件'}
+            </button>
+            {smtpTestResult && (
+              <span
+                className={`text-sm ${
+                  smtpTestResult.startsWith('✓') ? 'text-down' : 'text-error'
+                }`}
+              >
+                {smtpTestResult}
+              </span>
+            )}
           </div>
         </div>
       </section>

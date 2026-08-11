@@ -62,3 +62,15 @@ export async function postApiV1SettingsTestLlmFunc(): Promise<LlmTestResult> {
     method: 'POST',
   });
 }
+
+/**
+ * @description 测试 SMTP 发信（向配置的收件人发一封测试邮件）。
+ *
+ * @returns 测试结果（success / message）。
+ */
+export async function postApiV1SettingsTestSmtpFunc(): Promise<{ success: boolean; message: string }> {
+  return request<{ success: boolean; message: string }>({
+    url: '/api/v1/settings/test-smtp',
+    method: 'POST',
+  });
+}

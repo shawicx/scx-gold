@@ -10,4 +10,5 @@ export * from './FenXi';
 export * from './Watchlist';
 export * from './Settings';
 export * from './Gold';
+export * from './Auth';
 export * from './types';

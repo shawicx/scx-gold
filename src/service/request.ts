@@ -68,6 +68,16 @@ export async function request<T = unknown>(config: RequestConfig): Promise<T> {
       ...config,
       url,
       timeout: TIMEOUT,
+      headers: {
+        ...config.headers,
+        // 注入授权码头（从 localStorage 读，避免循环依赖 AuthContext）
+        ...(typeof window !== 'undefined'
+          ? (() => {
+              const token = window.localStorage.getItem('scx-gold.access-token');
+              return token ? { 'X-Access-Token': token } : {};
+            })()
+          : {}),
+      },
     });
 
     // 2. 解包统一响应 { code, message, data }
@@ -91,6 +101,12 @@ export async function request<T = unknown>(config: RequestConfig): Promise<T> {
       throw error;
     }
     if (isAxiosError(error)) {
+      // 401：授权码无效或过期，清除 token 触发重新认证
+      if (error.response?.status === 401) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem('scx-gold.access-token');
+        }
+      }
       // 尝试提取后端统一格式的错误信息
       const body = error.response?.data;
       if (body && typeof body === 'object' && 'message' in body) {

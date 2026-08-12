@@ -1,10 +1,11 @@
 /**
  * @description 顶部导航栏，通过 react-router NavLink 切换页面。
  *
- * 深色/浅色主题复用 ThemeToggle（由各页面 Header 自行放置，NavBar 不重复）。
+ * 右侧含退出按钮（清除授权码）。
  */
 
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 const NAV_ITEMS = [
   { to: '/', label: '涨停筛选器', end: true },
@@ -14,25 +15,38 @@ const NAV_ITEMS = [
 ];
 
 export function NavBar() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <nav className="border-b border-border bg-surface">
-      <div className="max-w-[2560px] mx-auto px-5 flex items-center gap-1 h-12">
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-surface-hover text-accent'
-                  : 'text-text-secondary hover:text-text hover:bg-surface-hover'
-              }`
-            }
+      <div className="max-w-[2560px] mx-auto px-5 flex items-center justify-between h-12">
+        <div className="flex items-center gap-1">
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-surface-hover text-accent'
+                    : 'text-text-secondary hover:text-text hover:bg-surface-hover'
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+        {isAuthenticated && (
+          <button
+            onClick={logout}
+            className="text-xs text-text-muted hover:text-error transition-colors"
+            title="退出登录"
           >
-            {item.label}
-          </NavLink>
-        ))}
+            退出
+          </button>
+        )}
       </div>
     </nav>
   );

@@ -147,6 +147,28 @@ export function AnalysisReportCard({
         />
       </div>
 
+      {/* 均线指标 */}
+      {(report.ma20 !== null || report.ma60 !== null) && (
+        <div className="flex gap-4 mt-2 mb-3 text-xs">
+          {report.ma20 !== null && (
+            <span>
+              <span className="text-text-muted">MA20 </span>
+              <span className={`font-medium ${report.close !== null && report.close > report.ma20 ? 'text-up' : 'text-down'}`}>
+                {report.ma20.toFixed(3)}
+              </span>
+            </span>
+          )}
+          {report.ma60 !== null && (
+            <span>
+              <span className="text-text-muted">MA60 </span>
+              <span className={`font-medium ${report.close !== null && report.close > report.ma60 ? 'text-up' : 'text-down'}`}>
+                {report.ma60.toFixed(3)}
+              </span>
+            </span>
+          )}
+        </div>
+      )}
+
       {/* AI 解读摘要 */}
       {report.summary && (
         <div className="mt-3 pt-3 border-t border-border">

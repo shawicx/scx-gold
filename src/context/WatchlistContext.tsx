@@ -23,12 +23,7 @@ import type { WatchlistItemData } from '@/service/types';
 
 const STORAGE_KEY = 'scx-gold.watchlist';
 
-/** 首次使用或后端不可达时的默认关注列表 */
-const DEFAULT_WATCHLIST: WatchlistItemData[] = [
-  { code: '510300', name: '沪深300ETF', sort_order: 0 },
-  { code: '159915', name: '创业板ETF', sort_order: 1 },
-  { code: '512100', name: '中证1000ETF', sort_order: 2 },
-];
+/** 无默认关注列表——用户自行添加 */
 
 interface WatchlistContextValue {
   items: WatchlistItemData[];
@@ -43,14 +38,14 @@ const WatchlistContext = createContext<WatchlistContextValue | null>(null);
 
 /** 从 localStorage 读取缓存（后端不可达时兜底） */
 function loadCached(): WatchlistItemData[] {
-  if (typeof window === 'undefined') return DEFAULT_WATCHLIST;
+  if (typeof window === 'undefined') return [];
   const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) return DEFAULT_WATCHLIST;
+  if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : DEFAULT_WATCHLIST;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return DEFAULT_WATCHLIST;
+    return [];
   }
 }
 
@@ -58,25 +53,18 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WatchlistItemData[]>(loadCached);
   const [loading, setLoading] = useState(true);
 
-  // 启动时从后端加载（仅在首次使用——后端无可达且 localStorage 无缓存时——回退默认值）
+  // 启动时从后端加载
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const data = await getApiV1WatchlistFunc();
         if (!cancelled) {
-          // 后端可达：信任返回值（空数组表示用户主动清空过，不用默认值覆盖）
-          // 仅当后端返回空且本地也无缓存时，才用默认值（首次使用场景）
-          let list = data;
-          if (data.length === 0) {
-            const cached = loadCached();
-            list = cached.length > 0 ? [] : DEFAULT_WATCHLIST;
-          }
-          setItems(list);
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+          setItems(data);
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
       } catch {
-        // 后端不可达：首次加载用 localStorage 缓存
+        // 后端不可达：用 localStorage 缓存
         if (!cancelled) {
           setItems(loadCached());
         }

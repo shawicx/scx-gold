@@ -42,6 +42,8 @@ export function AnalysisTable({
               <th className="px-3 py-2 text-right font-medium">支撑1</th>
               <th className="px-3 py-2 text-right font-medium">支撑2</th>
               <th className="px-3 py-2 text-right font-medium">压力1</th>
+              <th className="px-3 py-2 text-right font-medium">MA20</th>
+              <th className="px-3 py-2 text-right font-medium">MA60</th>
             </tr>
           </thead>
           <tbody>
@@ -77,11 +79,13 @@ export function AnalysisTable({
                     <Cell value={r.support_1?.price ?? null} />
                     <Cell value={r.support_2?.price ?? null} />
                     <Cell value={r.resistance_1?.price ?? null} />
+                    <Cell value={r.ma20} />
+                    <Cell value={r.ma60} />
                   </>
                 ) : (
                   <td
                     className="px-3 py-2 text-error text-xs"
-                    colSpan={6}
+                    colSpan={8}
                   >
                     {r.error}
                   </td>

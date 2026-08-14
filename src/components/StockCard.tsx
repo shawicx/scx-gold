@@ -41,7 +41,7 @@ export function StockCard({ stock }: { stock: Stock }) {
       <div className="flex items-baseline gap-2 mb-3">
         <span
           ref={priceRef}
-          className={`text-2xl font-bold ${isUp ? 'text-up' : 'text-down'}`}
+          className={`text-xl md:text-2xl font-bold ${isUp ? 'text-up' : 'text-down'}`}
         >
           {formatPrice(stock.price)}
         </span>
@@ -56,23 +56,23 @@ export function StockCard({ stock }: { stock: Stock }) {
 
       <dl className="grid grid-cols-3 gap-2 m-0 mb-2.5">
         <div>
-          <dt className="text-[13px] text-text-muted mb-0.5">主力净流入</dt>
+          <dt className="text-xs md:text-[13px] text-text-muted mb-0.5">主力净流入</dt>
           <dd
             ref={inflowRef}
-            className={`m-0 text-[15px] font-medium ${stock.mainNetInflow >= 0 ? 'text-up' : 'text-down'}`}
+            className={`m-0 text-sm md:text-[15px] font-medium ${stock.mainNetInflow >= 0 ? 'text-up' : 'text-down'}`}
           >
             {formatAmount(stock.mainNetInflow)}
           </dd>
         </div>
         <div>
-          <dt className="text-[13px] text-text-muted mb-0.5">成交额</dt>
-          <dd className="m-0 text-[15px] font-medium">
+          <dt className="text-xs md:text-[13px] text-text-muted mb-0.5">成交额</dt>
+          <dd className="m-0 text-sm md:text-[15px] font-medium">
             {formatAmount(stock.amount)}
           </dd>
         </div>
         <div>
-          <dt className="text-[13px] text-text-muted mb-0.5">换手率</dt>
-          <dd className="m-0 text-[15px] font-medium">
+          <dt className="text-xs md:text-[13px] text-text-muted mb-0.5">换手率</dt>
+          <dd className="m-0 text-sm md:text-[15px] font-medium">
             {formatPct(stock.turnoverRate)}
           </dd>
         </div>

@@ -25,8 +25,8 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
   };
 
   return (
-    <section className="flex flex-wrap items-center gap-4 p-3 bg-surface border border-border rounded-lg mb-4">
-      <div className="flex items-center gap-1.5">
+    <section className="flex flex-wrap items-center gap-2 md:gap-4 p-2.5 md:p-3 bg-surface border border-border rounded-lg mb-4">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         <span className="text-xs text-text-secondary">板块</span>
         <div className="inline-flex border border-border rounded overflow-hidden divide-x divide-border">
           {(['main', 'all'] as BoardScope[]).map((scope) => (
@@ -41,7 +41,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         <span className="text-xs text-text-secondary">涨幅区间</span>
         <input
           type="number"
@@ -61,7 +61,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         <span className="text-text-secondary text-xs">%</span>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         <span className="text-xs text-text-secondary">主力资金</span>
         <select
           className="px-2 py-1 bg-bg text-text border border-border rounded text-[15px]"
@@ -76,7 +76,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </select>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         <label className="flex items-center gap-1 text-[15px] cursor-pointer">
           <input
             type="checkbox"
@@ -87,7 +87,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
         </label>
       </div>
 
-      <div className="flex items-center gap-1.5 ml-auto">
+      <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
         {isTrading && (
           <span className="text-xs px-2 py-0.5 rounded bg-[rgba(16,185,129,0.15)] text-down">
             交易中

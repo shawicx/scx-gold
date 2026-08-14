@@ -9,9 +9,9 @@ import {
   trendColorClass,
 } from '@/utils/analysis-style';
 
-function Cell({ value }: { value: number | null }) {
+function Cell({ value, className = '' }: { value: number | null; className?: string }) {
   return (
-    <td className="px-3 py-2 text-right tabular-nums">
+    <td className={`px-3 py-2 text-right tabular-nums ${className}`}>
       {value !== null ? value.toFixed(3) : '--'}
     </td>
   );
@@ -39,11 +39,11 @@ export function AnalysisTable({
               <th className="px-3 py-2 text-right font-medium">收盘</th>
               <th className="px-3 py-2 text-right font-medium">涨跌%</th>
               <th className="px-3 py-2 text-center font-medium">趋势</th>
-              <th className="px-3 py-2 text-right font-medium">支撑1</th>
-              <th className="px-3 py-2 text-right font-medium">支撑2</th>
-              <th className="px-3 py-2 text-right font-medium">压力1</th>
-              <th className="px-3 py-2 text-right font-medium">MA20</th>
-              <th className="px-3 py-2 text-right font-medium">MA60</th>
+              <th className="px-3 py-2 text-right font-medium hidden md:table-cell">支撑1</th>
+              <th className="px-3 py-2 text-right font-medium hidden md:table-cell">支撑2</th>
+              <th className="px-3 py-2 text-right font-medium hidden md:table-cell">压力1</th>
+              <th className="px-3 py-2 text-right font-medium hidden lg:table-cell">MA20</th>
+              <th className="px-3 py-2 text-right font-medium hidden lg:table-cell">MA60</th>
             </tr>
           </thead>
           <tbody>
@@ -76,16 +76,16 @@ export function AnalysisTable({
                         {r.trend}
                       </span>
                     </td>
-                    <Cell value={r.support_1?.price ?? null} />
-                    <Cell value={r.support_2?.price ?? null} />
-                    <Cell value={r.resistance_1?.price ?? null} />
-                    <Cell value={r.ma20} />
-                    <Cell value={r.ma60} />
+                    <Cell value={r.support_1?.price ?? null} className="hidden md:table-cell" />
+                    <Cell value={r.support_2?.price ?? null} className="hidden md:table-cell" />
+                    <Cell value={r.resistance_1?.price ?? null} className="hidden md:table-cell" />
+                    <Cell value={r.ma20} className="hidden lg:table-cell" />
+                    <Cell value={r.ma60} className="hidden lg:table-cell" />
                   </>
                 ) : (
                   <td
                     className="px-3 py-2 text-error text-xs"
-                    colSpan={8}
+                    colSpan={5}
                   >
                     {r.error}
                   </td>

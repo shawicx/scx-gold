@@ -19,15 +19,15 @@ export function NavBar() {
 
   return (
     <nav className="border-b border-border bg-surface">
-      <div className="max-w-[2560px] mx-auto px-5 flex items-center justify-between h-12">
-        <div className="flex items-center gap-1">
+      <div className="max-w-[2560px] mx-auto px-4 md:px-5 flex items-center h-12">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                `flex-shrink-0 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-surface-hover text-accent'
                     : 'text-text-secondary hover:text-text hover:bg-surface-hover'
@@ -41,7 +41,7 @@ export function NavBar() {
         {isAuthenticated && (
           <button
             onClick={logout}
-            className="text-xs text-text-muted hover:text-error transition-colors"
+            className="flex-shrink-0 ml-2 text-xs text-text-muted hover:text-error transition-colors"
             title="退出登录"
           >
             退出

@@ -39,7 +39,7 @@ function GoldCard({ quote }: { quote: GoldQuote }) {
 
       {/* 现价 + 涨跌幅 */}
       <div className="flex items-baseline gap-3 mb-4 pb-4 border-b border-border">
-        <span className={`text-3xl font-bold ${priceColor}`}>
+        <span className={`text-2xl md:text-3xl font-bold ${priceColor}`}>
           {quote.price !== null ? quote.price.toFixed(2) : '--'}
         </span>
         {quote.change_pct !== null && (

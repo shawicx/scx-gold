@@ -13,6 +13,14 @@
   --color-accent: var(--accent);
   --color-warning: var(--warning);
   --color-error: var(--error);
+
+  /* 断点固定为 px，脱离 html { font-size: 18px } 的 rem 缩放，
+     让 md:/lg: 等响应式前缀在标准视口宽度触发。 */
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 }
 
 :root,
@@ -70,4 +78,28 @@ body {
 button {
   font-family: inherit;
   cursor: pointer;
+}
+
+/* 移动端：根字号回归 16px，避免手机上 18px 偏大导致内容拥挤 */
+@media (max-width: 767px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* 触摸设备：禁用 hover 粘连（tap 后不残留 hover 态） */
+@media (hover: none) {
+  button:hover {
+    background: inherit;
+  }
+}
+
+/* 横向滚动容器：隐藏滚动条（NavBar 用） */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

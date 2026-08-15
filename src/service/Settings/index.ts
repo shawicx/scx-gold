@@ -21,6 +21,7 @@ export interface SettingsUpdateRequest {
   smtp_from_name?: string;
   smtp_use_ssl?: string;
   notify_emails?: string;
+  auth_code_ttl_hours?: string;
 }
 
 /**

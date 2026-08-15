@@ -248,6 +248,7 @@ export interface AppSettings {
   smtp_from_name: string | null;
   smtp_use_ssl: string | null;
   notify_emails: string | null;
+  auth_code_ttl_hours: string | null;
 }
 
 /**

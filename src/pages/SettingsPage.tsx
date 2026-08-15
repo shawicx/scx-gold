@@ -410,6 +410,27 @@ export function SettingsPage() {
         </div>
       </section>
 
+      {/* 授权码配置 */}
+      <section className="bg-surface border border-border rounded-lg p-5 shadow-[var(--shadow)] mb-4">
+        <h2 className="text-base font-semibold m-0 mb-4">授权码配置</h2>
+        <div>
+          <label className="block text-sm text-text-secondary mb-1">
+            有效期（小时）
+          </label>
+          <input
+            type="number"
+            min={1}
+            value={displayValue('auth_code_ttl_hours')}
+            onChange={(e) => updateField('auth_code_ttl_hours', e.target.value)}
+            placeholder="72"
+            className="w-full bg-bg border border-border rounded-md px-3 py-2 text-sm outline-none focus:border-accent font-mono"
+          />
+          <p className="text-xs text-text-muted mt-1">
+            默认 72 小时（3 天），修改后对新申请的授权码即时生效
+          </p>
+        </div>
+      </section>
+
       {/* 运维操作 */}
       <section className="bg-surface border border-border rounded-lg p-5 shadow-[var(--shadow)] mb-4">
         <h2 className="text-base font-semibold m-0 mb-2">运维操作</h2>

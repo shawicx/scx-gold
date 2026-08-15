@@ -3,7 +3,7 @@
  *
  * 路由：
  *   /               → 涨停候选筛选器
- *   /etf-analysis   → ETF 支撑位分析
+ *   /etf-analysis   → ETF、个股分析
  *   /gold           → 黄金行情
  *   /settings       → 应用配置
  *

@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 const NAV_ITEMS = [
   { to: '/', label: '涨停筛选器', end: true },
-  { to: '/etf-analysis', label: 'ETF 支撑位分析', end: false },
+  { to: '/etf-analysis', label: 'ETF、个股分析', end: false },
   { to: '/gold', label: '黄金', end: false },
   { to: '/settings', label: '设置', end: false },
 ];

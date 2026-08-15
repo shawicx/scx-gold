@@ -4,6 +4,7 @@
  * 职责：
  * - snake_case → camelCase 字段映射
  * - market 字符串归一化（后端 "上证"/"深证"/"创业板"/"北交所"/"ETF" → 前端 "sh"/"sz"/"bj"）
+ * - code 去市场前缀归一化（后端列表返回 "sz300209" → 前端 "300209"；详情等接口与涨停阈值只认纯数字代码）
  * - 分页拉满：后端单页 ≤100，前端需要全量数据用于排序/筛选
  * - null → 默认值转换（后端字段可空，前端 Stock 字段不可空）
  */
@@ -23,6 +24,23 @@ function normalizeMarket(market: string): Market {
 }
 
 /**
+ * @description 去掉股票代码的市场前缀，统一为纯数字代码。
+ *
+ * 后端列表接口返回的代码带市场前缀（如 "sz300209"、"sh600519"），
+ * 而个股详情等路径参数接口与前端涨停阈值判断（getBoardLimit）只认纯数字代码。
+ *
+ * @param code 后端返回的股票代码（可能带 sh/sz/bj 前缀）。
+ * @returns 纯数字股票代码（对无前缀代码幂等）。
+ *
+ * @example
+ * stripMarketPrefix('sz300209'); // '300209'
+ * stripMarketPrefix('600519');   // '600519'
+ */
+function stripMarketPrefix(code: string): string {
+  return code.replace(/^(sh|sz|bj)/i, '');
+}
+
+/**
  * 把单个后端 StockListItem 转为前端 Stock。
  *
  * @param item 后端行情条目。
@@ -30,7 +48,7 @@ function normalizeMarket(market: string): Market {
  */
 export function adaptStockListItem(item: StockListItem): Stock {
   return {
-    code: item.code,
+    code: stripMarketPrefix(item.code),
     name: item.name,
     market: normalizeMarket(item.market),
     price: item.price ?? 0,
@@ -94,7 +112,7 @@ export async function fetchAllStocks(boardScope: BoardScope): Promise<Stock[]> {
   if (boardScope === 'main') {
     return allItems
       .filter((item) => {
-        const code = item.code;
+        const code = stripMarketPrefix(item.code);
         return (code.startsWith('6') && !code.startsWith('688'))
           || code.startsWith('0');
       })

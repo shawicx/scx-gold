@@ -4,7 +4,7 @@
 
 ## 调用链总览
 
-### 涨停筛选器（东方财富 JSONP 链路）
+### 涨停筛选器（后端 service 链路）
 
 ```text
 ScreenerPage
@@ -17,8 +17,6 @@ ScreenerPage
       └─ filterStocks(allStocks, filters)     前端二次过滤（涨幅区间/资金/ST）
   └─ generateClues(stock)                     [src/utils/clues.ts] 生成线索标签
 ```
-
-> **注意**：当前 `stockListAdapter.ts` 实际走的是**后端** `/api/v1/stock/list`（已迁移），而非东方财富 JSONP。`src/api/stocks.ts`（东方财富直连）是历史实现，保留但未被 `useScreener` 使用。
 
 ### 其余页面（后端 service 链路）
 
@@ -63,6 +61,7 @@ const data = await request<StockListData>({
 | 转换 | 说明 |
 | ---- | ---- |
 | 字段命名 | snake_case → camelCase |
+| code 归一化 | 去掉市场前缀（`sz300209`→`300209`），详情等路径参数接口与涨停阈值判断只认纯数字代码 |
 | market 归一化 | `"上证"→sh`、`"深证"/"创业板"→sz`、`"北交所"/其他/bj`、`"ETF"→bj`（占位） |
 | null → 默认值 | 后端可空字段 → 0 / `'未知'` |
 | isST 推断 | `name.includes('ST')` |

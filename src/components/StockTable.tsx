@@ -12,6 +12,8 @@ interface StockTableProps {
   stocks: Stock[];
   sort: SortState;
   onSort: (key: SortKey) => void;
+  /** 点击行回调（打开个股详情） */
+  onRowClick?: (stock: Stock) => void;
 }
 
 const MARKET_LABEL: Record<Stock['market'], string> = {
@@ -29,7 +31,7 @@ const TD_LEFT =
 const TD_RIGHT =
   'px-2.5 py-2 text-right border-b border-border whitespace-nowrap';
 
-export function StockTable({ stocks, sort, onSort }: StockTableProps) {
+export function StockTable({ stocks, sort, onSort, onRowClick }: StockTableProps) {
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
   const sorted = sortStocks(stocks, sort);
   useFlipSort(tbodyRef, [sort.key, sort.order, stocks.length]);
@@ -56,7 +58,11 @@ export function StockTable({ stocks, sort, onSort }: StockTableProps) {
             const clues = generateClues(s);
             const isUp = s.pctChange >= 0;
             return (
-              <tr key={`${s.market}-${s.code}`} className="hover:bg-surface-hover">
+              <tr
+                key={`${s.market}-${s.code}`}
+                className={`hover:bg-surface-hover ${onRowClick ? 'cursor-pointer' : ''}`}
+                onClick={() => onRowClick?.(s)}
+              >
                 <td className={TD_LEFT}>{s.code}</td>
                 <td className={`${TD_LEFT} ${s.isST ? 'text-text-muted italic' : ''}`}>{s.name}</td>
                 <td className={TD_LEFT}>{MARKET_LABEL[s.market]}</td>

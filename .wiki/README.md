@@ -2,7 +2,7 @@
 
 A 股涨停候选筛选器 + ETF 支撑位分析 + 黄金行情 的前端单页应用（React 18 + Vite 5 + TypeScript + Tailwind v4）。
 
-本仓库**仅含前端**。后端为独立服务 `scx-stock-api`（FastAPI），通过 `/api/v1/*`、`/admin/*`、`/health` 提供数据，前端在开发期由 Vite proxy、生产期由 nginx 反代转发。股票涨停列表因依赖主力资金/行业字段，仍走东方财富公开 JSONP 直连。
+本仓库**仅含前端**。后端为独立服务 `scx-stock-api`（FastAPI），通过 `/api/v1/*`、`/admin/*`、`/health` 提供数据，前端在开发期由 Vite proxy、生产期由 nginx 反代转发。所有行情数据（含股票涨停列表）均经后端 service 层获取，无前端直连的第三方通道。
 
 ## 阅读路径
 

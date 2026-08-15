@@ -16,7 +16,7 @@ const MARKET_BG: Record<Stock['market'], string> = {
   bj: 'bg-[#722ed1]',
 };
 
-export function StockCard({ stock }: { stock: Stock }) {
+export function StockCard({ stock, onClick }: { stock: Stock; onClick?: () => void }) {
   const clues = generateClues(stock);
   const isUp = stock.pctChange >= 0;
 
@@ -25,7 +25,10 @@ export function StockCard({ stock }: { stock: Stock }) {
   const inflowRef = useNumberFlash<HTMLElement>(stock.mainNetInflow);
 
   return (
-    <div className="bg-surface border border-border rounded-lg p-3 shadow-[var(--shadow)]">
+    <div
+      className={`bg-surface border border-border rounded-lg p-3 shadow-[var(--shadow)] ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       <div className="flex justify-between items-center mb-2">
         <div className="font-semibold text-sm">
           <span

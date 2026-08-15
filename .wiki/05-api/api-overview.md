@@ -1,13 +1,14 @@
 # 前后端通信总览
 
-scx-gold 前端与后端 `scx-stock-api`（独立仓库，FastAPI）通过 HTTP JSON 通信，外加一条东方财富 JSONP 直连通道。
+scx-gold 前端与后端 `scx-stock-api`（独立仓库，FastAPI）通过 HTTP JSON 通信，**单一数据源**（无前端直连的第三方通道）。
 
-## 两条数据通道
+## 数据通道
 
 | 通道 | 用途 | 目标 | 前端入口 |
 | ---- | ---- | ---- | ---- |
-| 后端 service 层 | 指数/板块/搜索/关注/分析/黄金/配置/认证/运维/健康 | dev `localhost:8000` / prod `127.0.0.1:3800` | `src/service/request.ts` |
-| 东方财富 JSONP | 涨停筛选器股票列表（含主力资金/行业） | `push2.eastmoney.com`（公网） | `src/api/eastmoney.ts` |
+| 后端 service 层 | 股票/指数/板块/搜索/关注/分析/黄金/配置/认证/运维/健康 | dev `localhost:8000` / prod `127.0.0.1:3800` | `src/service/request.ts` |
+
+> 历史通道：东方财富 JSONP 直连（`src/api/`）已随第二期迁移删除（后端补齐主力资金/行业字段后），详见 `docs/superpowers/specs/2026-07-26-service-migration-design.md` §7。
 
 ## 后端基地址与转发
 

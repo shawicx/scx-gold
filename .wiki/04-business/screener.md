@@ -23,19 +23,19 @@
 
 - **当前实现**：后端 `/api/v1/stock/list`（已迁移），通过 `stockListAdapter.ts` 适配
 - 拉取策略：按 `change_pct` 降序分页，涨幅低于 9.5% 提前终止（详见 [03-codebase/data-flow.md](../03-codebase/data-flow.md)）
-- 历史实现：东方财富 JSONP 直连（`src/api/stocks.ts`，保留未用）
+- 历史实现：东方财富 JSONP 直连（`src/api/stocks.ts`），已删除
 
 ## 线索标签（Clue）
 
-来源：`src/utils/clues.ts`。每只股票根据指标自动生成标签，辅助判断。
+来源：`src/utils/clues.ts`。每只股票根据指标自动生成标签，辅助判断。涨跌停类线索的阈值**按板块涨跌停幅度拆分**（`getBoardLimit(code, isST)`：主板 10% / 创业板·科创板 20% / 北交所 30% / 主板 ST 5%），「封涨停/接近涨停」只在对应板块接近自身涨跌停幅度时触发。
 
 | 标签 | 类型 | 触发条件 |
 | ---- | ---- | ---- |
 | 主力大幅流入 | fund | 主力净流入 > 1 亿 |
 | 主力流入 | fund | 主力净流入 > 5000 万 |
 | 主力流出 | fund | 主力净流入 < 0 |
-| 封涨停 | limit | 涨幅 ≥ 9.95% 且现价 ≥ 最高价 × 0.999 |
-| 接近涨停 | limit | 涨幅 9.5%–9.95% |
+| 封涨停 | limit | 涨幅 ≥ 涨跌停幅度 - 0.05 且现价 ≥ 最高价 × 0.999 |
+| 接近涨停 | limit | 涨幅在 [涨跌停幅度 - 0.5, 涨跌停幅度 - 0.05) |
 | 炸板风险 | limit | 现价 < 最高价 × 0.99（冲高回落） |
 | 放量 | volume | 换手率 > 10% |
 | 低换手 | volume | 换手率 0–3% |
@@ -48,19 +48,30 @@
 - 交易时段（北京时间 09:15–11:30、13:00–15:30）：每 30s 自动刷新
 - 非交易时段：停止轮询，展示最近一次快照 + 「当前非交易时段」提示
 - 判定来源：`useTradingHours`（`src/hooks/useTradingHours.ts`）
+- 大盘指数条（`MarketIndexBar`）与板块排行（`SectorRanking`）同样按交易时段 30s 轮询，业务错误时静默降级（隐藏/占位），不打扰主链路
 
 ## UI 结构
 
 ```text
 ScreenerPage
   ├─ Header          最后更新时间 + 状态（stale/loading）
+  ├─ MarketIndexBar  大盘指数条（静默降级）
   ├─ Banner          错误/警告横幅（失败重试 / 非交易时段提示）
   ├─ FilterBar       筛选条件栏（板块/涨幅/资金/ST）+ 手动刷新
-  ├─ HighlightCards  重点观察卡片（线索最丰富的几只）
-  └─ StockTable      明细表格（多列排序，SortableTh）
+  ├─ HighlightCards  重点观察卡片（线索最丰富的几只，点击打开个股详情）
+  ├─ StockTable      明细表格（多列排序，SortableTh；行点击打开个股详情）
+  ├─ SectorRanking   板块涨跌排行（可折叠，静默降级）
+  └─ StockDetailDrawer 个股详情抽屉（后端 /stock/{code} + 前端数据兜底）
 ```
 
-组件：`src/components/Header.tsx`、`FilterBar.tsx`、`HighlightCards.tsx`、`StockTable.tsx`、`ClueTag.tsx`、`SortableTh.tsx`。
+组件：`src/components/Header.tsx`、`MarketIndexBar.tsx`、`FilterBar.tsx`、`HighlightCards.tsx`、`StockTable.tsx`、`SectorRanking.tsx`、`StockDetailDrawer.tsx`、`ClueTag.tsx`、`SortableTh.tsx`。
+
+## 个股详情抽屉
+
+- 点击重点观察卡片或表格行 → 右侧滑出 `StockDetailDrawer`
+- 数据：后端 `GET /api/v1/stock/{code}`（基础信息 + 实时行情，**无 K 线/资金流分时**）
+- 后端详情不含量能/资金字段，由前端 `Stock` 兜底展示换手率、主力净流入
+- 支持 loading / error（重试）/ 正常三态，ESC 或点击遮罩关闭
 
 ## 排序
 

@@ -37,23 +37,17 @@ ThemeProvider
 
 > 来源：`src/App.tsx:46-56`
 
-## 双数据源
+## 数据源
 
-### 1. 后端 `scx-stock-api`（主数据源）
+所有业务数据均来自后端 `scx-stock-api`（单一数据源），无前端直连的第三方通道：
 
 - 开发：Vite proxy 把 `/api`、`/admin`、`/health` 转发到 `http://localhost:8000`（`vite.config.ts:13-28`）
 - 生产：nginx 反代到 `127.0.0.1:3800`（`nginx.conf:26-35`，host 网络同机部署）
 - 统一响应 `{ code, message, data }`，`code===0` 成功，由 `src/service/request.ts` 解包
 - 代码由 `@scxfe/api-tool` 从 Apifox OpenAPI 生成（`api-power.config.ts`），手写真实类型于 `src/service/types/models.ts`
+- 涨停筛选器股票列表走 `/api/v1/stock/list` 分页拉取 + 提前终止（`stockListAdapter.ts`），详见 [03-codebase/data-flow.md](../03-codebase/data-flow.md)
 
-### 2. 东方财富 JSONP（股票涨停列表）
-
-- 前端直连 `https://push2.eastmoney.com/api/qt/clist/get`，免 key
-- 仅用于涨停筛选器主列表（依赖主力资金 `f62`、行业等字段，后端暂未补齐）
-- `src/api/eastmoney.ts` 封装 JSONP；`src/api/stocks.ts` 做字段映射
-- 详见 [05-api/eastmoney-jsonp.md](../05-api/eastmoney-jsonp.md)
-
-> 第二期迁移计划：后端补齐 `main_net_inflow`/`industry` 后，股票列表也迁到后端 service 层（见 `docs/superpowers/specs/2026-07-26-service-migration-design.md` §7）。
+> 历史实现：东方财富 JSONP 直连（`src/api/`）已随第二期迁移删除（后端补齐 `main_net_inflow`/`industry` 后）。详见 `docs/superpowers/specs/2026-07-26-service-migration-design.md` §7。
 
 ## 认证流
 

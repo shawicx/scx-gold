@@ -19,10 +19,13 @@ src/
 ├── components/               # 可复用 UI 组件
 │   ├── NavBar.tsx            #   顶部导航（NavLink 路由切换 + 退出）
 │   ├── Header.tsx            #   筛选器页头（最后更新时间 + 状态）
+│   ├── MarketIndexBar.tsx    #   大盘指数条（Header 下方，静默降级）
 │   ├── FilterBar.tsx         #   筛选条件栏
-│   ├── HighlightCards.tsx    #   重点观察卡片
-│   ├── StockTable.tsx        #   股票明细表格
+│   ├── HighlightCards.tsx    #   重点观察卡片（可点击打开个股详情）
+│   ├── StockTable.tsx        #   股票明细表格（行点击打开个股详情）
 │   ├── StockCard.tsx         #   单股卡片
+│   ├── StockDetailDrawer.tsx #   个股详情抽屉（右侧滑出）
+│   ├── SectorRanking.tsx     #   板块涨跌排行（表格下方，可折叠）
 │   ├── SortableTh.tsx        #   可排序表头
 │   ├── ClueTag.tsx           #   线索标签
 │   ├── Banner.tsx            #   通知横幅（error/warning）
@@ -45,6 +48,9 @@ src/
 ├── hooks/                    # 自定义 hooks
 │   ├── useScreener.ts        #   股票行情拉取 + 筛选 + 交易时段轮询
 │   ├── useAnalysis.ts        #   支撑位分析触发
+│   ├── useMarketIndex.ts     #   大盘指数轮询（交易时段 30s，静默降级）
+│   ├── useSectorRanking.ts   #   板块涨跌排行轮询（交易时段 30s，静默降级）
+│   ├── useStockDetail.ts     #   个股详情拉取（详情抽屉用）
 │   ├── useTradingHours.ts    #   交易时段判定（北京时间）
 │   ├── useSort.ts            #   多列排序状态
 │   └── animations/           #   GSAP 动画 hooks
@@ -64,18 +70,11 @@ src/
 │   └── <模块>/index.ts       #   按业务域分组：GeGu/BanKuai/DaPan/SouSuo/
 │                             #   FenXi/Watchlist/Settings/Gold/Auth/YunWei/JianKangJianCha
 │
-├── api/                      # 东方财富 JSONP 直连（仅涨停列表用）
-│   ├── eastmoney.ts          #   JSONP 封装
-│   └── stocks.ts             #   字段映射 + 板块筛选
-│
 ├── utils/                    # 纯函数工具
-│   ├── clues.ts              #   线索标签生成规则
+│   ├── clues.ts              #   线索标签生成规则（含按板块涨跌停幅度拆分）
 │   ├── format.ts             #   数字/金额/百分比格式化
 │   ├── sort.ts               #   排序比较器
 │   └── analysis-style.ts     #   分析报告样式辅助
-│
-├── data/
-│   └── industry-map.ts       #   股票代码 → 行业 静态映射（东方财富列表无行业时的兜底）
 │
 └── styles/
     └── index.css             #   Tailwind v4 入口 + CSS 变量主题
@@ -101,10 +100,12 @@ src/
 
 | 场景 | 数据源 | 入口文件 |
 | ---- | ---- | ---- |
-| 涨停筛选器股票列表 | 东方财富 JSONP | `src/api/stocks.ts` → `fetchStocks()` |
-| 指数/板块/搜索/关注/分析/黄金/配置/认证/运维 | 后端 `scx-stock-api` | `src/service/<模块>/index.ts` |
+| 涨停筛选器股票列表 | 后端 `/api/v1/stock/list`（分页拉取 + 提前终止） | `src/service/stockListAdapter.ts` → `getApiV1StockListFunc()` |
+| 大盘指数条 / 板块涨跌排行 | 后端 `/api/v1/market/index`、`/api/v1/sector/list` | `src/service/DaPan/index.ts`、`src/service/BanKuai/index.ts` |
+| 个股详情 | 后端 `/api/v1/stock/{code}` | `src/service/GeGu/index.ts` → `getApiV1StockByCodeFunc()` |
+| 搜索/关注/分析/黄金/配置/认证/运维 | 后端 `scx-stock-api` | `src/service/<模块>/index.ts` |
 
-> 虽然后端也有 `/api/v1/stock/list`，但因缺主力资金/行业字段，涨停列表暂不迁移（见 `stockListAdapter.ts` 与设计文档 §7）。
+> 股票列表原走东方财富 JSONP 直连（`src/api/`），后端补齐 `main_net_inflow`/`industry` 字段后已迁移并删除（见迁移设计 §7）。
 
 ## 命名约定
 

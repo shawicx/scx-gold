@@ -6,9 +6,11 @@ import { useFilters } from '../context/FilterContext';
 
 interface HighlightCardsProps {
   stocks: Stock[];
+  /** 点击卡片回调（打开个股详情） */
+  onSelect?: (stock: Stock) => void;
 }
 
-export function HighlightCards({ stocks }: HighlightCardsProps) {
+export function HighlightCards({ stocks, onSelect }: HighlightCardsProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { filters } = useFilters();
   useStaggerIn(ref, [filters.boardScope]);
@@ -27,7 +29,11 @@ export function HighlightCards({ stocks }: HighlightCardsProps) {
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"
     >
       {top.map((s) => (
-        <StockCard key={`${s.market}-${s.code}`} stock={s} />
+        <StockCard
+          key={`${s.market}-${s.code}`}
+          stock={s}
+          onClick={onSelect ? () => onSelect(s) : undefined}
+        />
       ))}
     </section>
   );

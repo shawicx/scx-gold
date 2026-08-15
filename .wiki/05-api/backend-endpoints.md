@@ -11,7 +11,7 @@
 | 方法 | 路径 | 函数 | 说明 |
 | ---- | ---- | ---- | ---- |
 | GET | `/api/v1/stock/list` | `getApiV1StockListFunc(params)` | 股票/ETF 行情分页列表 |
-| GET | `/api/v1/stock/{code}` | `getApiV1StockByCodeFunc(code)` | 个股详情（基础信息 + 实时行情） |
+| GET | `/api/v1/stock/{code}` | `getApiV1StockByCodeFunc(code)` | 个股详情（基础信息 + 实时行情，筛选器详情抽屉在用） |
 
 **列表参数** `GetApiV1StockListRequestType`：`market`（市场）、`type`（stock/etf/all）、`sort_by`、`descending`、`page`（从 1 起）、`page_size`（1-100）。
 

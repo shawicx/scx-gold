@@ -1,3 +1,8 @@
+/**
+ * @description 筛选条件栏：板块范围、涨幅区间、主力资金门槛、排除 ST、
+ * 行业板块 chip（来自板块排行联动，可点击清除）与刷新按钮。
+ */
+
 import { useFilters } from '../context/FilterContext';
 import { INFLOW_PRESETS, type BoardScope } from '../types';
 
@@ -14,6 +19,7 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
     setPctRange,
     setMinMainInflow,
     toggleExcludeST,
+    clearSector,
   } = useFilters();
 
   const handlePctChange = (idx: 0 | 1, raw: string) => {
@@ -40,6 +46,19 @@ export function FilterBar({ onRefresh, loading, isTrading }: FilterBarProps) {
           ))}
         </div>
       </div>
+
+      {filters.sector && (
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <button
+            className="flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent border border-accent/40 rounded text-[15px] cursor-pointer"
+            onClick={clearSector}
+            title="点击取消板块筛选"
+          >
+            板块：{filters.sector}
+            <span aria-hidden>✕</span>
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <span className="text-xs text-text-secondary">涨幅区间</span>

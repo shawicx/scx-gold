@@ -2,11 +2,13 @@
  * @description 板块涨跌排行：StockTable 下方可折叠的板块排行表。
  *
  * 数据来自 useSectorRanking（按涨跌幅降序前 50）；支持折叠/展开与手动刷新。
+ * 点击行将该板块写入筛选器（联动过滤上方个股列表），再次点击同板块取消。
  * 后端业务错误（如 DB 未连）且无数据时显示「板块数据暂不可用」占位，不打扰主链路。
  * 移动端隐藏部分列（上涨/下跌家数、领涨股）。
  */
 
 import { useState } from 'react';
+import { useFilters } from '@/context/FilterContext';
 import { useSectorRanking } from '@/hooks/useSectorRanking';
 import { formatPct, formatPrice } from '@/utils/format';
 
@@ -26,7 +28,18 @@ const TD_RIGHT =
 
 export function SectorRanking({ isTrading }: SectorRankingProps) {
   const { sectors, loading, hasError, refresh } = useSectorRanking(isTrading);
+  const { filters, setSector, clearSector } = useFilters();
   const [collapsed, setCollapsed] = useState(false);
+
+  /**
+   * @description 点击板块行：选中该板块写入筛选器；再次点击同板块取消筛选。
+   *
+   * @param name 板块名称（与个股 industry 字段同源）。
+   */
+  const handleRowClick = (name: string) => {
+    if (filters.sector === name) clearSector();
+    else setSector(name);
+  };
 
   const showPlaceholder = hasError && sectors.length === 0;
 
@@ -45,6 +58,9 @@ export function SectorRanking({ isTrading }: SectorRankingProps) {
             ▼
           </span>
           板块涨跌排行
+          <span className="ml-2 text-xs font-normal text-text-muted hidden md:inline">
+            点击行按板块筛选上方个股
+          </span>
         </button>
         <div className="flex items-center gap-3">
           {!collapsed && loading && (
@@ -87,9 +103,16 @@ export function SectorRanking({ isTrading }: SectorRankingProps) {
               {sectors.map((s) => {
                 const pct = s.change_pct ?? 0;
                 const isUp = pct >= 0;
+                const selected = filters.sector === s.name;
                 return (
-                  <tr key={s.code} className="hover:bg-surface-hover">
-                    <td className={TD_LEFT}>{s.name}</td>
+                  <tr
+                    key={s.code}
+                    className={`hover:bg-surface-hover cursor-pointer ${selected ? 'bg-accent/10' : ''}`}
+                    onClick={() => handleRowClick(s.name)}
+                    title={selected ? '点击取消板块筛选' : '点击按板块筛选上方个股'}
+                    aria-pressed={selected}
+                  >
+                    <td className={`${TD_LEFT} ${selected ? 'text-accent font-medium' : ''}`}>{s.name}</td>
                     <td className={TD_RIGHT}>{formatPrice(s.price ?? 0)}</td>
                     <td className={`${TD_RIGHT} ${isUp ? 'text-up' : 'text-down'}`}>
                       {isUp ? '+' : ''}

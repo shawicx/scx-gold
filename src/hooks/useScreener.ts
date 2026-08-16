@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchAllStocks } from '../service/stockListAdapter';
+import { filterStocks } from '../utils/filter';
 import type { FilterState, Stock } from '../types';
 
 interface ScreenerState {
@@ -63,14 +64,4 @@ export function useScreener(
     isStale,
     refresh: load,
   };
-}
-
-function filterStocks(stocks: Stock[], filters: FilterState): Stock[] {
-  const [minPct, maxPct] = filters.pctRange;
-  return stocks.filter((s) => {
-    if (s.pctChange < minPct || s.pctChange > maxPct) return false;
-    if (s.mainNetInflow < filters.minMainInflow) return false;
-    if (filters.excludeST && s.isST) return false;
-    return true;
-  });
 }

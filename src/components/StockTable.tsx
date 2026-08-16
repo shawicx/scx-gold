@@ -1,5 +1,11 @@
+/**
+ * @description 涨停候选明细表格：行首关注星标（快速切换关注）、
+ * 多列排序（Flip 动画）、线索标签展示；点击行打开个股详情抽屉。
+ */
+
 import { useRef } from 'react';
 import type { SortKey, Stock } from '../types';
+import { useWatchlist } from '@/context/WatchlistContext';
 import { generateClues } from '../utils/clues';
 import { formatAmount, formatPct, formatPrice } from '../utils/format';
 import { sortStocks } from '../utils/sort';
@@ -33,14 +39,26 @@ const TD_RIGHT =
 
 export function StockTable({ stocks, sort, onSort, onRowClick }: StockTableProps) {
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
+  const { has, add, remove } = useWatchlist();
   const sorted = sortStocks(stocks, sort);
   useFlipSort(tbodyRef, [sort.key, sort.order, stocks.length]);
+
+  /**
+   * @description 切换某只股票的关注状态（点击星标，不触发行点击）。
+   *
+   * @param stock 目标股票。
+   */
+  const handleToggleWatch = (stock: Stock) => {
+    if (has(stock.code)) remove(stock.code);
+    else add(stock.code, stock.name);
+  };
 
   return (
     <section className="bg-surface border border-border rounded-lg overflow-x-auto">
       <table className="w-full border-collapse text-sm md:text-[15px]">
         <thead>
           <tr>
+            <th className={`${TH_LEFT} w-8`} aria-label="关注">★</th>
             <SortableTh label="代码" sortKey="code" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
             <SortableTh label="名称" sortKey="name" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
             <SortableTh label="市场" sortKey="market" currentKey={sort.key} currentOrder={sort.order} onSort={onSort} align="left" />
@@ -57,12 +75,30 @@ export function StockTable({ stocks, sort, onSort, onRowClick }: StockTableProps
           {sorted.map((s) => {
             const clues = generateClues(s);
             const isUp = s.pctChange >= 0;
+            const watched = has(s.code);
             return (
               <tr
                 key={`${s.market}-${s.code}`}
                 className={`hover:bg-surface-hover ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick?.(s)}
               >
+                <td className={TD_LEFT}>
+                  <button
+                    role="switch"
+                    aria-checked={watched}
+                    aria-label={watched ? `移出关注 ${s.name}` : `加入关注 ${s.name}`}
+                    title={watched ? '移出关注' : '加入关注'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleWatch(s);
+                    }}
+                    className={`p-0 border-none bg-transparent cursor-pointer ${
+                      watched ? 'text-accent' : 'text-text-muted hover:text-accent'
+                    }`}
+                  >
+                    {watched ? '★' : '☆'}
+                  </button>
+                </td>
                 <td className={TD_LEFT}>{s.code}</td>
                 <td className={`${TD_LEFT} ${s.isST ? 'text-text-muted italic' : ''}`}>{s.name}</td>
                 <td className={TD_LEFT}>{MARKET_LABEL[s.market]}</td>

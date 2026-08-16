@@ -1,3 +1,8 @@
+/**
+ * @description 重点观察卡片：展示个股行情摘要与线索标签；
+ * watched 为 true 时标题栏显示关注星标。
+ */
+
 import type { Stock } from '../types';
 import { generateClues } from '../utils/clues';
 import { formatAmount, formatPct, formatPrice } from '../utils/format';
@@ -16,7 +21,16 @@ const MARKET_BG: Record<Stock['market'], string> = {
   bj: 'bg-[#722ed1]',
 };
 
-export function StockCard({ stock, onClick }: { stock: Stock; onClick?: () => void }) {
+export function StockCard({
+  stock,
+  onClick,
+  watched,
+}: {
+  stock: Stock;
+  onClick?: () => void;
+  /** 是否已关注（显示星标标识） */
+  watched?: boolean;
+}) {
   const clues = generateClues(stock);
   const isUp = stock.pctChange >= 0;
 
@@ -37,6 +51,11 @@ export function StockCard({ stock, onClick }: { stock: Stock; onClick?: () => vo
             {MARKET_LABEL[stock.market]}
           </span>
           {stock.name}
+          {watched && (
+            <span className="text-accent ml-1" title="已关注" aria-label="已关注">
+              ★
+            </span>
+          )}
         </div>
         <div className="text-xs text-text-muted">{stock.code}</div>
       </div>

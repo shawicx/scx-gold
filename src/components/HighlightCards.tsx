@@ -1,8 +1,14 @@
+/**
+ * @description 重点观察卡片列表：展示筛选结果前 6 名；
+ * 已关注的股票卡片显示星标标识。
+ */
+
 import { useRef } from 'react';
 import type { Stock } from '../types';
 import { StockCard } from './StockCard';
 import { useStaggerIn } from '../hooks/animations/useStaggerIn';
 import { useFilters } from '../context/FilterContext';
+import { useWatchlist } from '@/context/WatchlistContext';
 
 interface HighlightCardsProps {
   stocks: Stock[];
@@ -13,6 +19,7 @@ interface HighlightCardsProps {
 export function HighlightCards({ stocks, onSelect }: HighlightCardsProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { filters } = useFilters();
+  const { has } = useWatchlist();
   useStaggerIn(ref, [filters.boardScope]);
 
   const top = stocks.slice(0, 6);
@@ -33,6 +40,7 @@ export function HighlightCards({ stocks, onSelect }: HighlightCardsProps) {
           key={`${s.market}-${s.code}`}
           stock={s}
           onClick={onSelect ? () => onSelect(s) : undefined}
+          watched={has(s.code)}
         />
       ))}
     </section>

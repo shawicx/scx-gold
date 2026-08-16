@@ -11,6 +11,8 @@ interface FilterContextValue {
   setPctRange: (range: [number, number]) => void;
   setMinMainInflow: (value: number) => void;
   toggleExcludeST: () => void;
+  setSector: (sector: string) => void;
+  clearSector: () => void;
   resetFilters: () => void;
 }
 
@@ -31,6 +33,12 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const toggleExcludeST = () =>
     setFilters((prev) => ({ ...prev, excludeST: !prev.excludeST }));
 
+  const setSector = (sector: string) =>
+    setFilters((prev) => ({ ...prev, sector }));
+
+  const clearSector = () =>
+    setFilters((prev) => ({ ...prev, sector: undefined }));
+
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
   return (
@@ -41,6 +49,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
         setPctRange,
         setMinMainInflow,
         toggleExcludeST,
+        setSector,
+        clearSector,
         resetFilters,
       }}
     >

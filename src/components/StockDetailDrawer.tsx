@@ -3,12 +3,15 @@
  *
  * 数据来自 useStockDetail（后端 /api/v1/stock/{code}）；
  * 后端详情不含量能与资金字段，由前端 Stock（筛选器已有数据）兜底展示换手率/主力净流入。
+ * 底部操作区：加入/移出关注（WatchlistContext，全局共享）、携带 code 跳转分析页。
  * 支持 loading / error（重试）/ 正常三态，ESC 或点击遮罩关闭。
  */
 
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Stock } from '../types';
+import { useWatchlist } from '@/context/WatchlistContext';
 import { useStockDetail } from '@/hooks/useStockDetail';
 import { formatAmount, formatPct, formatPrice } from '@/utils/format';
 
@@ -54,6 +57,27 @@ export function StockDetailDrawer({ open, stock, onClose }: StockDetailDrawerPro
   const { detail, loading, error, refresh } = useStockDetail(
     open ? stock?.code ?? null : null,
   );
+  const { has, add, remove } = useWatchlist();
+  const navigate = useNavigate();
+  const isWatched = stock ? has(stock.code) : false;
+
+  /**
+   * @description 切换关注状态：已关注则移出，未关注则加入（乐观更新由 Context 处理）。
+   */
+  const handleToggleWatch = () => {
+    if (!stock) return;
+    if (isWatched) remove(stock.code);
+    else add(stock.code, stock.name);
+  };
+
+  /**
+   * @description 携带个股代码跳转分析页并关闭抽屉。
+   */
+  const handleGoAnalysis = () => {
+    if (!stock) return;
+    onClose();
+    navigate(`/etf-analysis?code=${stock.code}`);
+  };
 
   // ESC 键关闭
   useEffect(() => {
@@ -169,6 +193,26 @@ export function StockDetailDrawer({ open, stock, onClose }: StockDetailDrawerPro
               )}
             </div>
           )}
+        </div>
+
+        {/* 底部操作区：关注 + 去分析 */}
+        <div className="flex gap-2 px-5 py-3 border-t border-border shrink-0">
+          <button
+            onClick={handleToggleWatch}
+            className={`flex-1 px-3 py-2 rounded text-sm border transition-colors ${
+              isWatched
+                ? 'border-border text-text-muted hover:text-text'
+                : 'border-accent text-accent hover:bg-accent hover:text-white'
+            }`}
+          >
+            {isWatched ? '★ 移出关注' : '☆ 加入关注'}
+          </button>
+          <button
+            onClick={handleGoAnalysis}
+            className="flex-1 px-3 py-2 bg-accent text-white border-none rounded text-sm hover:opacity-90"
+          >
+            去分析
+          </button>
         </div>
       </div>
     </>

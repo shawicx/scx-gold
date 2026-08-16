@@ -23,6 +23,8 @@ export interface FilterState {
   pctRange: [number, number];
   minMainInflow: number;
   excludeST: boolean;
+  /** 行业板块筛选（来自板块排行联动）；undefined 表示不按板块过滤 */
+  sector?: string;
 }
 
 export const DEFAULT_FILTERS: FilterState = {

@@ -7,9 +7,13 @@
  *
  * 页面加载时默认从 DB 读取关注标的各自最后一次分析报告（不触发重算），
  * 点击「开始分析」才强制重算。
+ *
+ * 支持筛选器跳转定位（/etf-analysis?code=xxxxxx）：
+ * 未关注时提示一键加入；已关注时自动打开该标的历史分析抽屉。
  */
 
 import { useEffect, useState, type CSSProperties } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { AnalysisReportCard } from '@/components/AnalysisReportCard';
 import { AnalysisTable } from '@/components/AnalysisTable';
@@ -31,10 +35,17 @@ const SIDEBAR_MIN_WIDTH = 240;
 const SIDEBAR_MAX_WIDTH = 560;
 
 export function EtfAnalysisPage() {
-  const { items, loading: watchlistLoading } = useWatchlist();
+  const { items, loading: watchlistLoading, add } = useWatchlist();
   const codes = items.map((it) => it.code);
   const analysis = useAnalysis(codes);
   const [view, setView] = useState<ViewMode>('cards');
+
+  // 筛选器「去分析」跳转携带的定位标的（/etf-analysis?code=xxxxxx）
+  const [searchParams, setSearchParams] = useSearchParams();
+  const focusCode = searchParams.get('code');
+  const focusInList = focusCode
+    ? items.some((it) => it.code === focusCode)
+    : false;
 
   // 从 DB 加载的最新报告（页面初始化展示，不触发重算）
   const [cachedReports, setCachedReports] = useState<AnalysisReport[] | null>(null);
@@ -95,6 +106,25 @@ export function EtfAnalysisPage() {
       historyCode
     : '';
 
+  /**
+   * @description 定位标的已关注时，待报告加载完成自动打开其历史分析抽屉，
+   * 并清除 URL 中的 code 参数（避免刷新重复触发）。
+   */
+  useEffect(() => {
+    if (!focusCode || watchlistLoading || !focusInList || cachedLoading) return;
+    setHistoryCode(focusCode);
+    setSearchParams({}, { replace: true });
+  }, [focusCode, focusInList, watchlistLoading, cachedLoading, setSearchParams]);
+
+  /**
+   * @description 一键加入定位标的到关注列表（名称由后端补全），
+   * 加入成功后由定位 effect 自动打开历史抽屉。
+   */
+  const handleAddFocus = () => {
+    if (!focusCode) return;
+    add(focusCode);
+  };
+
   return (
     <div className="max-w-[2560px] mx-auto px-5 pt-4 pb-10">
       {/* 页头 */}
@@ -102,6 +132,16 @@ export function EtfAnalysisPage() {
         <h1 className="text-lg font-semibold m-0">ETF、个股分析</h1>
         <ThemeToggle />
       </header>
+
+      {/* 筛选器跳转定位：未关注提示一键加入 */}
+      {focusCode && !watchlistLoading && !focusInList && (
+        <Banner
+          type="warning"
+          message={`标的 ${focusCode} 尚未关注，加入后可获取分析报告`}
+          onAction={handleAddFocus}
+          actionLabel="加入关注"
+        />
+      )}
 
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-0">
         {/* 左：关注列表（宽度通过 CSS 变量控制，可拖拽调整） */}

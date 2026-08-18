@@ -4,12 +4,12 @@
 
 | 命令 | 作用 | 来源 |
 | ---- | ---- | ---- |
-| `pnpm install` | 安装依赖（frozen-lockfile 用于 CI） | `package.json` scripts |
-| `pnpm dev` | 启动 Vite 开发服务器（HMR） | `vite.config.ts` |
-| `pnpm build` | `tsc` 类型检查 + `vite build` 产出 `dist/` | `package.json:9` |
-| `pnpm preview` | 预览构建产物 | — |
-| `pnpm test` | Vitest 单次运行 | `vitest run` |
-| `pnpm test:watch` | Vitest 监听模式 | `vitest` |
+| `bun install` | 安装依赖（`--frozen-lockfile` 用于 CI） | `package.json` scripts |
+| `bun run dev` | 启动 Vite 开发服务器（HMR） | `vite.config.ts` |
+| `bun run build` | `tsc` 类型检查 + `vite build` 产出 `dist/` | `package.json:9` |
+| `bun run preview` | 预览构建产物 | — |
+| `bun run test` | Vitest 单次运行 | `vitest run` |
+| `bun run test:watch` | Vitest 监听模式 | `vitest` |
 
 ## 开发服务器与后端联调
 
@@ -51,7 +51,7 @@ Vite dev server 配置了反向代理（`vite.config.ts:13-28`），把以下前
 
 ## 类型检查
 
-`tsconfig.json` 开启 `strict`、`noUnusedLocals`、`noUnusedParameters`、`noFallthroughCasesInSwitch`。`pnpm build` 会先跑 `tsc`，类型错误会阻断构建。
+`tsconfig.json` 开启 `strict`、`noUnusedLocals`、`noUnusedParameters`、`noFallthroughCasesInSwitch`。`bun run build` 会先跑 `tsc`，类型错误会阻断构建。
 
 ## 相关
 

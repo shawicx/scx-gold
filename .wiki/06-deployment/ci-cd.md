@@ -25,11 +25,11 @@ test (push + PR)
 ## Job 1：test（`ubuntu-latest`）
 
 1. Checkout
-2. `pnpm/action-setup@v4` 安装 pnpm 11.0.9
-3. `actions/setup-node@v4` Node 22，启用 pnpm 缓存
-4. `pnpm install --frozen-lockfile`
-5. `pnpm run test`（Vitest）
-6. `pnpm run build`（tsc + vite build，验证类型与构建）
+2. `oven-sh/setup-bun@v2` 安装 bun 1.3.14
+3. `actions/setup-node@v4` Node 22
+4. `bun install --frozen-lockfile`
+5. `bun run test`（Vitest）
+6. `bun run build`（tsc + vite build，验证类型与构建）
 
 > 来源：`.github/workflows/deploy.yml:43-69`
 

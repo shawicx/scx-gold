@@ -36,7 +36,7 @@ A 股涨停候选筛选器 + ETF 支撑位分析 + 黄金行情 的前端单页�
 | HTTP | axios（封装于 `src/service/request.ts`） |
 | API 代码生成 | `@scxfe/api-tool`（从 Apifox OpenAPI 生成 `src/service/`） |
 | 测试 | Vitest + Testing Library + jsdom |
-| 包管理 | pnpm 11（workspace） |
+| 包管理 | bun 1.3（`bun.lock` 锁定） |
 | 部署 | Docker（nginx:alpine）→ 阿里云 ACR → ECS（host 网络，6900 端口） |
 
 ## 相关文档

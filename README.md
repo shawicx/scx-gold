@@ -5,12 +5,12 @@ A-share limit-up candidate screening tool. Live data from East Money public JSON
 ## Dev
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
 ## Test
 
 ```bash
-pnpm test
+bun run test
 ```

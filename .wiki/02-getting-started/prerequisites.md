@@ -4,11 +4,10 @@
 
 | 依赖 | 版本 | 说明 |
 | ---- | ---- | ---- |
-| Node.js | 22 | Dockerfile 与 CI 均用 `node:22-alpine` / `setup-node@v4` node 22 |
-| pnpm | 11.0.9 | `packageManager` 字段锁定；CI 用 `pnpm/action-setup@v4` 激活 |
+| Bun | 1.3.14 | `packageManager` 字段锁定；Dockerfile 用 `oven/bun:1-alpine`，CI 用 `oven-sh/setup-bun@v2` |
 | 浏览器 | 现代浏览器 | SPA，依赖 ES2020 + Tailwind v4 |
 
-> `pnpm-workspace.yaml` 声明本目录为 workspace 根（`packages: [.]`），并允许 esbuild 原生构建（`allowBuilds.esbuild: true`）。
+> esbuild 的原生构建由 bun 默认信任依赖列表（trustedDependencies）自动放行，无需额外配置。
 
 ## 后端依赖（联调必需）
 
@@ -28,8 +27,8 @@
 ## 验证安装
 
 ```bash
-pnpm install   # 安装依赖
-pnpm dev       # 启动开发服务器（默认 Vite 端口 5173）
+bun install   # 安装依赖
+bun run dev   # 启动开发服务器（默认 Vite 端口 5173）
 ```
 
 打开浏览器访问开发服务器地址，应能看到涨停筛选器页面。

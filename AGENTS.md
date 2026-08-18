@@ -96,9 +96,9 @@
 
 ### 包管理与运行时
 
-1. **必须使用 `pnpm` 作为包管理器**，不得使用 npm / yarn / bun（除非用户明确说明例外）
-2. **Node.js 版本要求 22+**（在 `.nvmrc` / `package.json#engines` 中维护）
-3. 包管理脚本统一通过 `pnpm run <script>` 调用
+1. **必须使用 `bun` 作为包管理器**，不得使用 npm / yarn / pnpm（除非用户明确说明例外）
+2. **Bun 版本要求 1.3+**（在 `package.json#packageManager` 中锁定）
+3. 包管理脚本统一通过 `bun run <script>` 调用
 
 ### 项目结构约定
 
@@ -115,12 +115,12 @@
 
 ### 构建与测试命令
 
-- `pnpm install` — 安装依赖
-- `pnpm dev` — 启动开发服务器
-- `pnpm build` — 生产构建
-- `pnpm preview` — 预览构建产物
-- `pnpm lint` — 代码检查
-- `pnpm test` — 运行测试（如已配置）
+- `bun install` — 安装依赖
+- `bun run dev` — 启动开发服务器
+- `bun run build` — 生产构建
+- `bun run preview` — 预览构建产物
+- `bun run lint` — 代码检查
+- `bun run test` — 运行测试（如已配置）
 
 ### 依赖与配置规则
 

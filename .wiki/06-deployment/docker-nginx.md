@@ -4,11 +4,10 @@ scx-gold 构建为静态文件，由 nginx 托管并反向代理 API 到后端�
 
 ## 多阶段 Dockerfile（`Dockerfile`）
 
-### 阶段 1：构建（`node:22-alpine`）
+### 阶段 1：构建（`oven/bun:1-alpine`）
 
-1. 启用 corepack，激活 `pnpm@11.0.9`（与 `packageManager` 字段一致）
-2. 先复制 `package.json` + `pnpm-lock.yaml` + `pnpm-workspace.yaml`，`pnpm install --frozen-lockfile`（利用层缓存）
-3. 复制源码，`pnpm run build`（`tsc` 类型检查 + `vite build`）→ 产出 `dist/`
+1. 先复制 `package.json` + `bun.lock`，`bun install --frozen-lockfile`（利用层缓存）
+2. 复制源码，`bun run build`（`tsc` 类型检查 + `vite build`）→ 产出 `dist/`
 
 ### 阶段 2：运行时（`nginx:alpine`）
 
